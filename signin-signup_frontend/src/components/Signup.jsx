@@ -12,6 +12,9 @@ import {
   ArrowRight,
 } from "lucide-react";
 const BASE_URL = import.meta.env.VITE_API_URL;
+
+const res = axios.get(`${import.meta.env.VITE_API_URL}/api/auth/dashboard`);
+
 function Signup() {
   const navigate = useNavigate();
   const vantaRef = useRef(null);
@@ -67,7 +70,7 @@ function Signup() {
     return () => {
       if (vantaEffect) vantaEffect.destroy();
     };
-  }, []);
+  });
 
   // Handle input change
   const handleChange = (e) => {

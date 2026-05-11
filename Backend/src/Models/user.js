@@ -9,7 +9,7 @@ const bookmarkSchema = new mongoose.Schema(
     questionText: { type: String },
     notes: { type: String, default: "" },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 /* ── Weak topic sub-schema ── */
@@ -21,7 +21,7 @@ const weakTopicSchema = new mongoose.Schema(
     attempts: { type: Number, default: 0 },
     suggestion: { type: String, default: "" },
   },
-  { _id: false }
+  { _id: false },
 );
 
 /* ── Main user schema ── */
@@ -110,15 +110,13 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 /* ── VIRTUAL: accuracy ── */
 userSchema.virtual("accuracy").get(function () {
   if (this.totalQuestionsAttempted === 0) return 0;
-  return Math.round(
-    (this.totalCorrect / this.totalQuestionsAttempted) * 100
-  );
+  return Math.round((this.totalCorrect / this.totalQuestionsAttempted) * 100);
 });
 
 /* ── VIRTUAL: level ── */

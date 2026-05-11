@@ -22,7 +22,17 @@ connectDB();
 // middleware
 app.use(
   cors({
-    origin: "https://brainnbyte.netlify.app",
+    origin: function (origin, callback) {
+      // allow requests with no origin (mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      const allowed = [
+        "https://brainnbyte.netlify.app",
+        "http://localhost:5173",
+        "http://localhost:5174",
+      ];
+      if (allowed.includes(origin)) return callback(null, true);
+      callback(new Error("Not allowed by CORS"));
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,

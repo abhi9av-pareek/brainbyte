@@ -128,10 +128,10 @@ const css = `
 const SUBJECTS = [
   { name: "Mathematics", icon: "✦" },
   { name: "Physics", icon: "⚛" },
-  { name: "Chemistry", icon: "⚗" },
-  { name: "Biology", icon: "🌿" },
+  { name: "DSA", icon: "⚗" },
+  { name: "Operating System", icon: "🌿" },
   { name: "Comp. Science", icon: "💻" },
-  { name: "English", icon: "✍" },
+  { name: "Aptitude", icon: "✍" },
 ];
 
 const POPULAR_EXAMS = [
@@ -616,7 +616,7 @@ export default function QuizSetup() {
                     })
                   }
                 >
-                  ⚡ Start Quiz →
+                  Start Quiz →
                 </button>
               </div>
             </div>

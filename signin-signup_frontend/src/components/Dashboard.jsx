@@ -271,16 +271,26 @@ function Dashboard() {
 
     fetchDashboard(token);
   }, [navigate]);
-
   const fetchDashboard = async (token) => {
     try {
-      const res = await fetch("/api/quiz/dashboard", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/quiz/dashboard`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
       const data = await res.json();
+
       if (data.success) {
         setDashboard(data.dashboard);
-        setUser((prev) => ({ ...prev, streak: data.dashboard.streak }));
+
+        setUser((prev) => ({
+          ...prev,
+          streak: data.dashboard.streak,
+        }));
       }
     } catch (err) {
       console.error("Dashboard fetch error:", err);

@@ -11,7 +11,7 @@ const css = `
     --accent: #7C5CFC; --accent2: #00E5C0; --accent3: #FF6B6B;
     --amber: #FFB347; --text: #F0EFF8; --muted: #7B7A8C; --muted2: #3A394A;
   }
-  .rs-root { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .rs-root { font-family: 'DM  Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
   /* NAV */
   .rs-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 56px; border-bottom: 1px solid var(--border); background: rgba(10,11,15,0.97); position: sticky; top: 0; z-index: 100; }
@@ -406,7 +406,7 @@ export default function Results() {
               className="rs-btn rs-btn-primary"
               onClick={() => navigate("/QuizSetup")}
             >
-              ⚡ New Quiz
+              New Quiz
             </button>
           </div>
         </nav>
@@ -713,7 +713,7 @@ export default function Results() {
                 className="rs-btn rs-btn-start"
                 onClick={() => navigate("/QuizSetup")}
               >
-                ⚡ New Quiz
+                New Quiz
               </button>
             </div>
           </div>

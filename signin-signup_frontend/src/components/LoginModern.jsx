@@ -74,7 +74,11 @@ function LoginModern() {
   const handleLogin = async () => {
     try {
       setIsLoading(true);
-      const res = await axios.post("/api/auth/login", formData);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+
+        formData,
+      );
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data));
       navigate("/dashboard");
