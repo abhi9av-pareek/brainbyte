@@ -1,21 +1,37 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axiosInstance from "../utils/axiosConfig"; // ✅ use axios so interceptor attaches token
+import axiosInstance from "../utils/axiosConfig"; // use axios so interceptor attaches token
 
 /* ─── CSS (converted from brainbyte_mcq_quiz.html) ─── */
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── DARK THEME (default) ── */
   :root {
     --bg: #0A0B0F; --surface: #111318; --surface2: #181B23;
     --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
     --accent: #7C5CFC; --accent2: #00E5C0; --accent3: #FF6B6B;
     --amber: #FFB347; --text: #F0EFF8; --muted: #7B7A8C; --muted2: #3A394A;
   }
-  .qz-root { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── LIGHT THEME ── */
+  [data-theme="light"] {
+    --bg:      #F5F5FA;
+    --surface: #FFFFFF;
+    --surface2:#F0EFF8;
+    --border:  rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text:    #0A0B0F;
+    --muted:   #7B7A8C;
+    --muted2:  #C8C7D4;
+  }
+
+  .qz-root { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
 
   /* NAV */
-  .qz-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 56px; border-bottom: 1px solid var(--border); background: rgba(10,11,15,0.97); position: sticky; top: 0; z-index: 100; }
+  .qz-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 56px; border-bottom: 1px solid var(--border); background: rgba(10,11,15,0.97); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; transition: background .3s; }
+  [data-theme="light"] .qz-nav { background: rgba(245,245,250,0.92); }
   .qz-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 19px; display: flex; align-items: center; gap: 8px; }
   .qz-logo-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
   .qz-logo span { color: var(--accent2); }
@@ -28,6 +44,10 @@ const css = `
   .qz-nav-right { display: flex; align-items: center; gap: 12px; }
   .qz-quit-btn { font-size: 13px; color: var(--muted); background: none; border: 1px solid var(--muted2); border-radius: 8px; padding: 5px 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; }
   .qz-quit-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+
+  /* THEME TOGGLE */
+  .qz-theme-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; color: var(--muted); }
+  .qz-theme-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   /* PROGRESS BAR */
   .qz-progress-wrap { height: 3px; background: var(--muted2); width: 100%; }
@@ -45,7 +65,7 @@ const css = `
 
   /* STATS ROW */
   .qz-stats-row { display: flex; gap: 10px; margin-bottom: 1.25rem; }
-  .qz-stat-chip { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px; text-align: center; }
+  .qz-stat-chip { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px; text-align: center; transition: background .3s; }
   .qz-stat-chip .sv { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 2px; }
   .qz-stat-chip .sk { font-size: 11px; color: var(--muted); }
   .sv-green  { color: var(--accent2); }
@@ -72,7 +92,7 @@ const css = `
   .qz-map-toggle:hover { border-color: var(--border2); color: var(--text); }
 
   /* QUESTION MAP */
-  .qz-map { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; margin-bottom: 1.25rem; }
+  .qz-map { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; margin-bottom: 1.25rem; transition: background .3s; }
   .qz-map-title { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
   .qz-map-grid { display: flex; flex-wrap: wrap; gap: 6px; }
   .qz-map-dot { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; cursor: pointer; transition: all .15s; border: 1px solid var(--border2); background: var(--surface2); color: var(--muted); }
@@ -81,7 +101,7 @@ const css = `
   .qz-map-dot.skipped  { background: rgba(255,179,71,0.12); border-color: rgba(255,179,71,0.3); color: var(--amber); }
 
   /* QUESTION CARD */
-  .qz-q-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 18px; padding: 2rem; margin-bottom: 1.25rem; }
+  .qz-q-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 18px; padding: 2rem; margin-bottom: 1.25rem; transition: background .3s; }
   .qz-q-text { font-size: 17px; font-weight: 500; line-height: 1.65; color: var(--text); }
 
   /* OPTIONS */
@@ -123,7 +143,8 @@ const css = `
   .qz-bookmark-btn.saved { border-color: var(--amber); color: var(--amber); background: rgba(255,179,71,0.08); }
 
   /* SUBMITTING OVERLAY */
-  .qz-overlay { position: fixed; inset: 0; background: rgba(10,11,15,0.85); z-index: 200; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+  .qz-overlay { position: fixed; inset: 0; background: rgba(10,11,15,0.85); z-index: 200; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; transition: background .3s; }
+  [data-theme="light"] .qz-overlay { background: rgba(245,245,250,0.88); }
   .qz-overlay-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
   .qz-overlay-sub { font-size: 14px; color: var(--muted); }
 `;
@@ -180,6 +201,18 @@ export default function Quiz() {
   const [timeLeft, setTimeLeft] = useState(timePerQuestion);
   const [submitting, setSubmitting] = useState(false);
 
+  /* ════════════ THEME (light/dark) ════════════ */
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("brainbyte-theme") || "dark";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("brainbyte-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+
   const timerRef = useRef(null);
   const startTimeRef = useRef(Date.now());
   const totalStartRef = useRef(Date.now());
@@ -199,14 +232,14 @@ export default function Quiz() {
   const currentQ = questions[currentIdx];
 
   /* ════════════ FETCH QUESTIONS ════════════
-     ✅ Use axiosInstance — the request interceptor automatically
+     Use axiosInstance — the request interceptor automatically
         reads token from localStorage and sets Authorization header.
         No manual token handling needed here.
   ═══════════════════════════════════════════ */
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        // ✅ Guard: verify token exists and looks like a JWT before requesting
+        //  Guard: verify token exists and looks like a JWT before requesting
         const token = getToken();
         if (!token || token === "undefined" || token === "null") {
           console.error("No valid token found, redirecting to login");
@@ -216,7 +249,7 @@ export default function Quiz() {
 
         const subjects = Array.isArray(subject) ? subject : [subject];
 
-        // ✅ axiosInstance already has baseURL + Authorization interceptor
+        //  axiosInstance already has baseURL + Authorization interceptor
         const res = await axiosInstance.post("/api/quiz/generate-questions", {
           subjects,
           difficulty,
@@ -240,7 +273,7 @@ export default function Quiz() {
       } catch (err) {
         console.error("fetchQuestions error:", err);
 
-        // ✅ If 401, token is bad — clear storage and redirect to login
+        //  If 401, token is bad — clear storage and redirect to login
         if (err.response?.status === 401) {
           console.error("Token rejected by server — clearing and redirecting");
           localStorage.removeItem("token");
@@ -386,7 +419,7 @@ export default function Quiz() {
         isBookmarked: !!bookmarked[i],
       }));
 
-      // ✅ Use axiosInstance here too — consistent token handling
+      //  Use axiosInstance here too — consistent token handling
       const res = await axiosInstance.post("/api/quiz/submit", {
         subject: Array.isArray(subject) ? subject.join(", ") : subject,
         difficulty,
@@ -510,6 +543,17 @@ export default function Quiz() {
             </span>
           </div>
           <div className="qz-nav-right">
+            <button
+              className="qz-theme-btn"
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {theme === "dark" ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+              )}
+            </button>
             <button
               className="qz-quit-btn"
               onClick={() => {

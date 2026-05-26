@@ -6,6 +6,8 @@ import QuizSetup from "./components/QuizSetup";
 import Quiz from "./components/Quiz";
 import ResultsHistory from "./components/ResultsHistory";
 import Results from "./components/Results";
+import Analytics from "./components/Analytics";
+import Profile from "./components/Profile";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/quiz" element={<Quiz />} />
         <Route path="/results" element={<Results />} />
         <Route path="/results/history" element={<ResultsHistory />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );

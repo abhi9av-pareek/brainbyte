@@ -360,15 +360,7 @@ function Dashboard() {
 
           <ul className="bb-nav-links">
             <li>
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert("Analytics dashboard is cooking… coming soon!");
-                }}
-              >
-                Analytics
-              </a>
+              <a onClick={() => navigate("/analytics")}>Analytics</a>
             </li>
           </ul>
 
@@ -697,10 +689,7 @@ function Dashboard() {
             </p>
           </div>
           <div className="bb-sidebar-menu">
-            <div
-              className="profile"
-              onClick={() => alert("My Profile is cooking… coming soon!")}
-            >
+            <div className="profile" onClick={() => navigate("/profile")}>
               My Profile
             </div>
 

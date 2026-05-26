@@ -11,9 +11,6 @@ import {
   EyeOff,
   ArrowRight,
 } from "lucide-react";
-const BASE_URL = import.meta.env.VITE_API_URL;
-
-const res = axios.get(`${import.meta.env.VITE_API_URL}/api/auth/dashboard`);
 
 function Signup() {
   const navigate = useNavigate();
@@ -114,7 +111,7 @@ function Signup() {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${BASE_URL}/api/auth/signup`, formData);
+      const res = await axios.post("/api/auth/signup", formData);
 
       console.log("Signup success:", res.data);
 
@@ -400,7 +397,7 @@ function Signup() {
       </div>
 
       {/* Styles */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;

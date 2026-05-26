@@ -1,7 +1,16 @@
-import fetch from "node-fetch";
+import axios from "axios";
+import http from "http";
+import https from "https";
 
 const NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
 const NVIDIA_MODEL = "deepseek-ai/deepseek-v4-flash";
+
+// ─── Validate API key at first request (dotenv loads after imports) ───────────
+let apiKeyWarned = false;
+
+// ─── Keep-alive agents prevent TCP idle timeouts on slow AI responses ─────────
+const httpAgent = new http.Agent({ keepAlive: true, keepAliveMsecs: 30000 });
+const httpsAgent = new https.Agent({ keepAlive: true, keepAliveMsecs: 30000 });
 
 // ─── In-memory cache (replace with Redis or MongoDB for production) ───────────
 const quizCache = new Map();
@@ -11,47 +20,16 @@ const getCacheKey = (subjects, difficulty, count) =>
   `${Array.isArray(subjects) ? subjects.sort().join("+") : subjects}__${difficulty}__${count}`;
 
 // ─── Prompt builder ────────────────────────────────────────────────────────────
-// Generates a small chunk (max 10 at a time) to keep JSON reliable
-const buildPrompt = (subjects, difficulty, count, timePerQuestion) => {
+// Optimized: much shorter prompt = fewer input tokens = faster first-token
+const buildPrompt = (subjects, difficulty, count) => {
   const subjectList = Array.isArray(subjects) ? subjects.join(", ") : subjects;
-  const difficultyGuide = {
-    Easy: "basic recall, definitions, simple concepts for beginners",
-    Medium: "applied thinking, multi-step reasoning, conceptual understanding",
-    Hard: "advanced analysis, edge cases, exam-level problem solving",
-  };
 
-  return `You are a JSON-only quiz generator. Output NOTHING except valid JSON.
+  return `Generate ${count} MCQ questions as JSON. Subject: ${subjectList}. Difficulty: ${difficulty}.
 
-Generate EXACTLY ${count} multiple-choice questions.
+Return ONLY valid JSON, no markdown:
+{"quiz":[{"subject":"str","topic":"str","question":"str","options":["A text","B text","C text","D text"],"correctAnswer":"A","explanation":"str"}]}
 
-Subject(s): ${subjectList}
-Difficulty: ${difficulty} (${difficultyGuide[difficulty] || difficultyGuide.Medium})
-Time per question: ${timePerQuestion} seconds
-
-ABSOLUTE RULES:
-1. Output ONLY a JSON object. No prose, no markdown, no backticks.
-2. Start with { and end with }
-3. EXACTLY ${count} questions in the "quiz" array
-4. Each question has EXACTLY 4 options labeled as full text (not "A","B","C","D")
-5. correctAnswer must be exactly one of: "A", "B", "C", or "D"
-6. No trailing commas anywhere
-7. All strings must be properly escaped
-
-JSON SCHEMA:
-{
-  "quiz": [
-    {
-      "subject": "string",
-      "topic": "string",
-      "question": "string",
-      "options": ["option text", "option text", "option text", "option text"],
-      "correctAnswer": "A",
-      "explanation": "string"
-    }
-  ]
-}
-
-OUTPUT JSON NOW:`;
+Rules: exactly ${count} items, 4 options each, correctAnswer is A/B/C/D, short explanation. Output JSON now:`;
 };
 
 // ─── Aggressive JSON repair ────────────────────────────────────────────────────
@@ -72,10 +50,6 @@ const repairJSON = (raw) => {
 
   // Fix trailing commas before } or ]
   text = text.replace(/,\s*([}\]])/g, "$1");
-
-  // Fix unescaped quotes inside strings (naive but helps a lot)
-  // Replace " that are NOT preceded by : [ , { \n with \"
-  // This is intentionally simple — a full parser would be overkill here
 
   return text;
 };
@@ -108,42 +82,63 @@ const parseResponse = (rawText) => {
   throw new Error("Could not parse response as JSON after all strategies");
 };
 
-// ─── Single NVIDIA API call — no timeout, let the model finish ────────────────
+// ─── Single NVIDIA API call using axios with keep-alive ───────────────────────
 const callNvidia = async (prompt) => {
-  const response = await fetch(NVIDIA_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.NVIDIA_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: NVIDIA_MODEL,
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.2,
-      max_tokens: 6000,
-      top_p: 0.7,
-    }),
-  });
+  try {
+    const response = await axios.post(
+      NVIDIA_API_URL,
+      {
+        model: NVIDIA_MODEL,
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.4,
+        max_tokens: 4000,
+        top_p: 0.7,
+        stream: false,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.NVIDIA_API_KEY}`,
+        },
+        timeout: 120000, // 120s total request timeout
+        httpAgent,
+        httpsAgent,
+        // Prevent axios from buffering large responses in memory
+        maxContentLength: 50 * 1024 * 1024,
+        maxBodyLength: 50 * 1024 * 1024,
+      },
+    );
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`NVIDIA API ${response.status}: ${errText.slice(0, 200)}`);
+    const rawText = response.data?.choices?.[0]?.message?.content;
+    if (!rawText) {
+      console.error(
+        "NVIDIA API returned empty content:",
+        JSON.stringify(response.data).slice(0, 300),
+      );
+      throw new Error("Empty response from NVIDIA API");
+    }
+
+    return rawText;
+  } catch (err) {
+    // Axios wraps errors — extract useful info
+    if (err.code === "ECONNABORTED" || err.code === "ETIMEDOUT") {
+      throw new Error("NVIDIA API request timed out — the AI service is slow, please retry");
+    }
+    if (err.response) {
+      const status = err.response.status;
+      const body =
+        typeof err.response.data === "string"
+          ? err.response.data.slice(0, 500)
+          : JSON.stringify(err.response.data).slice(0, 500);
+      console.error(`NVIDIA API error — Status: ${status}, Body: ${body}`);
+      throw new Error(`NVIDIA API ${status}: ${body.slice(0, 200)}`);
+    }
+    throw err;
   }
-
-  const data = await response.json();
-  const rawText = data?.choices?.[0]?.message?.content;
-  if (!rawText) throw new Error("Empty response from NVIDIA API");
-
-  return rawText;
 };
 
 // ─── Generate one chunk with retries ──────────────────────────────────────────
-const generateChunk = async (
-  subjects,
-  difficulty,
-  chunkSize,
-  timePerQuestion,
-) => {
+const generateChunk = async (subjects, difficulty, chunkSize) => {
   const MAX_RETRIES = 2;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -151,12 +146,7 @@ const generateChunk = async (
       console.log(
         `  Chunk attempt ${attempt}: generating ${chunkSize} questions...`,
       );
-      const prompt = buildPrompt(
-        subjects,
-        difficulty,
-        chunkSize,
-        timePerQuestion,
-      );
+      const prompt = buildPrompt(subjects, difficulty, chunkSize);
       const rawText = await callNvidia(prompt);
 
       console.log(`  Raw response preview: ${rawText.slice(0, 150)}`);
@@ -167,25 +157,20 @@ const generateChunk = async (
     } catch (err) {
       console.warn(`  ✗ Attempt ${attempt} failed: ${err.message}`);
       if (attempt === MAX_RETRIES) throw err;
-      await new Promise((r) => setTimeout(r, 1500)); // short backoff
+      await new Promise((r) => setTimeout(r, 500)); // short backoff
     }
   }
 };
 
-// ─── Chunked generation: splits large requests into ≤10-question batches ──────
-// Key insight: 1 call for 20 questions often gives broken JSON.
-// 2 parallel calls for 10 questions each = faster + more reliable.
-const generateInChunks = async (
-  subjects,
-  difficulty,
-  totalCount,
-  timePerQuestion,
-) => {
-  const CHUNK_SIZE = 10; // sweet spot for JSON reliability
+// ─── Chunked generation: splits requests into ≤5-question batches ─────────────
+// Using 5 instead of 10 gives better parallelism:
+// 10 questions = 2 parallel 5-question calls ≈ half the wall-clock time
+const generateInChunks = async (subjects, difficulty, totalCount) => {
+  const CHUNK_SIZE = 5;
 
   if (totalCount <= CHUNK_SIZE) {
     // Small request — single call
-    return generateChunk(subjects, difficulty, totalCount, timePerQuestion);
+    return generateChunk(subjects, difficulty, totalCount);
   }
 
   // Split into chunks
@@ -201,11 +186,8 @@ const generateInChunks = async (
   );
 
   // Run ALL chunks in parallel (Promise.all)
-  // This is the main speed win — 20 questions = 2 parallel 10-question calls
   const results = await Promise.all(
-    chunks.map((size) =>
-      generateChunk(subjects, difficulty, size, timePerQuestion),
-    ),
+    chunks.map((size) => generateChunk(subjects, difficulty, size)),
   );
 
   return results.flat();
@@ -252,6 +234,21 @@ export const generateQuestions = async (req, res) => {
   const startTime = Date.now();
 
   try {
+    // Guard: check API key
+    if (
+      !process.env.NVIDIA_API_KEY ||
+      process.env.NVIDIA_API_KEY.trim() === ""
+    ) {
+      if (!apiKeyWarned) {
+        console.error("⚠️  NVIDIA_API_KEY is missing or empty in .env — quiz generation will fail!");
+        apiKeyWarned = true;
+      }
+      return res.status(500).json({
+        success: false,
+        message: "AI service is not configured — contact the administrator",
+      });
+    }
+
     const {
       subjects,
       difficulty = "Medium",
@@ -305,7 +302,6 @@ export const generateQuestions = async (req, res) => {
       subjects,
       safeDifficulty,
       safeCount,
-      timePerQuestion,
     );
 
     // Sanitize
@@ -351,17 +347,25 @@ export const generateQuestions = async (req, res) => {
       `✗ generateQuestions failed after ${elapsed}ms:`,
       error.message,
     );
+    console.error(`  Full error:`, error.stack || error);
 
     // Friendly error message
+    const isTimeout =
+      error.message.includes("timed out") ||
+      error.message.includes("ETIMEDOUT") ||
+      error.message.includes("ECONNABORTED");
     const isUnavailable =
       error.message.includes("Cannot connect") ||
-      error.message.includes("NVIDIA API");
+      error.message.includes("NVIDIA API") ||
+      isTimeout;
 
     return res.status(500).json({
       success: false,
-      message: isUnavailable
-        ? "AI service is temporarily unavailable, please try again"
-        : "Failed to generate questions — please try again",
+      message: isTimeout
+        ? "AI service took too long — please try again"
+        : isUnavailable
+          ? "AI service is temporarily unavailable, please try again"
+          : "Failed to generate questions — please try again",
       error: error.message,
       responseTimeMs: elapsed,
     });

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -140,7 +142,7 @@ export default function ResultsHistory() {
           return;
         }
 
-        const res = await fetch("/api/quiz/history?limit=50", {
+        const res = await fetch(`${API_URL}/api/quiz/history?limit=50`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
