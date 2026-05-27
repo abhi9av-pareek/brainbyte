@@ -540,7 +540,7 @@ function LoginModern() {
           <div className="bb-logo">
             <div className="bb-logo-icon">🧠</div>
             <div className="bb-logo-text">
-              Brain <span>Byte</span>
+              Gyan<span>tra</span>
             </div>
           </div>
 

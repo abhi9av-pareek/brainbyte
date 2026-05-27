@@ -174,7 +174,7 @@ function Signup() {
               Create Account
             </h1>
             <p className="text-slate-400 text-sm">
-              Join the BrainByte community and master your exams
+              Join the Gyantra community and master your exams
             </p>
           </div>
 

@@ -369,7 +369,7 @@ function Dashboard() {
         <nav className="bb-nav">
           <div className="bb-logo">
             <div className="bb-logo-icon">🧠</div>
-            Brain<span>Byte</span>
+            Gyan<span>tra</span>
           </div>
 
           <ul className="bb-nav-links">

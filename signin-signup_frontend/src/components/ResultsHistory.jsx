@@ -197,7 +197,7 @@ export default function ResultsHistory() {
         <nav className="rh-nav">
           <div className="rh-logo" onClick={() => navigate("/dashboard")}>
             <div className="rh-logo-icon">🧠</div>
-            Brain<span>Byte</span>
+            Gyan<span>tra</span>
           </div>
           <ul className="rh-nav-links">
             <li>

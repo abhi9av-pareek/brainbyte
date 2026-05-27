@@ -400,7 +400,7 @@ export default function Results() {
         <nav className="rs-nav">
           <div className="rs-logo">
             <div className="rs-logo-icon">🧠</div>
-            Brain<span>Byte</span>
+            Gyan<span>tra</span>
           </div>
           <div className="rs-nav-right">
             <button

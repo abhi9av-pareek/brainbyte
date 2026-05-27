@@ -63,11 +63,27 @@ const userSchema = new mongoose.Schema(
     bio: {
       type: String,
       trim: true,
-      maxlength: 160,
+      maxlength: 300,
       default: "",
     },
     avatar: {
       type: String,
+      default: "",
+    },
+
+    /* ── EDUCATION EXTRAS ── */
+    institution: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    yearOfStudy: {
+      type: String,
+      default: "",
+    },
+    fieldOfStudy: {
+      type: String,
+      trim: true,
       default: "",
     },
 
@@ -111,6 +127,22 @@ const userSchema = new mongoose.Schema(
         type: String,
         enum: ["Easy", "Medium", "Hard"],
         default: "Medium",
+      },
+      instantFeedback: {
+        type: Boolean,
+        default: true,
+      },
+      shuffleQuestions: {
+        type: Boolean,
+        default: true,
+      },
+      showStreak: {
+        type: Boolean,
+        default: true,
+      },
+      emailNotifications: {
+        type: Boolean,
+        default: false,
       },
     },
 

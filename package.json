@@ -1,5 +1,5 @@
 {
-  "name": "brain-byte-root",
+  "name": "gyantra-root",
   "version": "1.0.0",
   "scripts": {
     "backend": "cd Backend && npm run dev",

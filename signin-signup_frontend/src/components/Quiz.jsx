@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import axiosInstance from "../utils/axiosConfig"; // use axios so interceptor attaches token
 
-/* ─── CSS (converted from brainbyte_mcq_quiz.html) ─── */
+/* ─── CSS (converted from gyantra_mcq_quiz.html) ─── */
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -468,7 +468,7 @@ export default function Quiz() {
             <div className="qz-spinner" />
             <div className="qz-loading-title">Generating your quiz...</div>
             <div className="qz-loading-sub">
-              Brain-byte is crafting {questionCount} {difficulty} questions on-
+              Gyantra is crafting {questionCount} {difficulty} questions on-
               {Array.isArray(subject) ? subject.join(", ") : subject}, it can
               take some time
             </div>
@@ -526,7 +526,7 @@ export default function Quiz() {
         <nav className="qz-nav">
           <div className="qz-logo">
             <div className="qz-logo-icon">🧠</div>
-            Brain<span>Byte</span>
+            Gyan<span>tra</span>
           </div>
           <div className="qz-nav-meta">
             <span className={`qz-nav-tag tag-${diffTag}`}>{difficulty}</span>
