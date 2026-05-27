@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../contexts/ThemeContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -763,19 +764,13 @@ function FloatingQuotes() {
 ════════════════════════════════════════════════ */
 export default function Analytics() {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("brainbyte-theme") || "dark";
-  });
+  const { theme, toggleTheme } = useTheme();
   const [history, setHistory] = useState([]);
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [animated, setAnimated] = useState(false);
 
-  /* toggle theme on root element + persist */
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("brainbyte-theme", theme);
-  }, [theme]);
+
 
   /* fetch data */
   useEffect(() => {
@@ -949,7 +944,7 @@ export default function Analytics() {
           <div className="an-nav-right">
             <button
               className="an-theme-btn"
-              onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+              onClick={toggleTheme}
               title="Toggle theme"
             >
               {theme === "dark" ? Icon.sun : Icon.moon}

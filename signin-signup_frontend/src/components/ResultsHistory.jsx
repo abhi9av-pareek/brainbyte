@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../contexts/ThemeContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -12,10 +13,16 @@ const css = `
     --accent: #7C5CFC; --accent2: #00E5C0; --accent3: #FF6B6B;
     --amber: #FFB347; --text: #F0EFF8; --muted: #7B7A8C; --muted2: #3A394A;
   }
-  .rh-root { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  [data-theme="light"] {
+    --bg: #F5F5FA; --surface: #FFFFFF; --surface2: #F0EFF8;
+    --border: rgba(0,0,0,0.07); --border2: rgba(0,0,0,0.12);
+    --text: #0A0B0F; --muted: #7B7A8C; --muted2: #C8C7D4;
+  }
+  .rh-root { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
 
   /* NAV */
-  .rh-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 56px; border-bottom: 1px solid var(--border); background: rgba(10,11,15,0.97); position: sticky; top: 0; z-index: 100; }
+  .rh-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 56px; border-bottom: 1px solid var(--border); background: rgba(10,11,15,0.97); position: sticky; top: 0; z-index: 100; transition: background .3s; }
+  [data-theme="light"] .rh-nav { background: rgba(245,245,250,0.95); }
   .rh-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 19px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
   .rh-logo-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
   .rh-logo span { color: var(--accent2); }
@@ -30,7 +37,12 @@ const css = `
   .rh-btn-primary { background: var(--accent); color: #fff; }
   .rh-btn-primary:hover { background: #9074fd; transform: translateY(-1px); }
   .rh-btn-ghost { background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid var(--border2); }
+  [data-theme="light"] .rh-btn-ghost { background: rgba(0,0,0,0.04); }
   .rh-btn-ghost:hover { background: rgba(255,255,255,0.1); }
+
+  /* THEME TOGGLE */
+  .rh-theme-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; color: var(--muted); }
+  .rh-theme-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   /* MAIN */
   .rh-main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
@@ -119,6 +131,7 @@ const formatDate = (dateStr) => {
 
 export default function ResultsHistory() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
@@ -198,6 +211,17 @@ export default function ResultsHistory() {
             </li>
           </ul>
           <div className="rh-nav-right">
+            <button
+              className="rh-theme-btn"
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {theme === "dark" ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+              )}
+            </button>
             <button
               className="rh-btn rh-btn-primary"
               onClick={() => navigate("/QuizSetup")}

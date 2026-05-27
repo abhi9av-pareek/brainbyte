@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTheme } from "../contexts/ThemeContext";
 import axiosInstance from "../utils/axiosConfig"; // use axios so interceptor attaches token
 
 /* ─── CSS (converted from brainbyte_mcq_quiz.html) ─── */
@@ -202,16 +203,7 @@ export default function Quiz() {
   const [submitting, setSubmitting] = useState(false);
 
   /* ════════════ THEME (light/dark) ════════════ */
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("brainbyte-theme") || "dark";
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("brainbyte-theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  const { theme, toggleTheme } = useTheme();
 
   const timerRef = useRef(null);
   const startTimeRef = useRef(Date.now());

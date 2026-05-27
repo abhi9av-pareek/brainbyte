@@ -1,5 +1,47 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+
+/* ─── helpers to read/write profile from localStorage ─── */
+const readProfile = () => ({
+  name: JSON.parse(localStorage.getItem("user") || "{}").name || "",
+  email: JSON.parse(localStorage.getItem("user") || "{}").email || "",
+  educationLevel:
+    JSON.parse(localStorage.getItem("user") || "{}").educationLevel || "",
+  contactNumber:
+    JSON.parse(localStorage.getItem("user") || "{}").contactNumber || "",
+  nickname: localStorage.getItem("bb_nickname") || "",
+  bio: localStorage.getItem("bb_bio") || "",
+  avatar: localStorage.getItem("bb_avatar") || "",
+  defaultDiff: localStorage.getItem("bb_defaultDiff") || "Medium",
+  instantFB: localStorage.getItem("bb_instantFB") !== "false",
+  shuffleQ: localStorage.getItem("bb_shuffleQ") !== "false",
+  showStreak: localStorage.getItem("bb_showStreak") !== "false",
+  emailNotif: localStorage.getItem("bb_emailNotif") === "true",
+});
+
+const writeProfile = (data) => {
+  /* persist quiz preferences */
+  localStorage.setItem("bb_nickname", data.nickname);
+  localStorage.setItem("bb_bio", data.bio);
+  localStorage.setItem("bb_avatar", data.avatar); // base64 or emoji string
+  localStorage.setItem("bb_defaultDiff", data.defaultDiff);
+  localStorage.setItem("bb_instantFB", String(data.instantFB));
+  localStorage.setItem("bb_shuffleQ", String(data.shuffleQ));
+  localStorage.setItem("bb_showStreak", String(data.showStreak));
+  localStorage.setItem("bb_emailNotif", String(data.emailNotif));
+
+  /* persist name back into the user object */
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  localStorage.setItem(
+    "user",
+    JSON.stringify({
+      ...user,
+      name: data.name,
+      educationLevel: data.educationLevel,
+      contactNumber: data.contactNumber,
+    }),
+  );
+};
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
@@ -30,25 +72,20 @@ const css = `
   .pf-btn-danger:hover { background: rgba(255,107,107,0.2); }
 
   /* MAIN */
-  .pf-main { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+  .pf-main { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem 7rem; }
 
   /* TABS */
   .pf-tabs { display: flex; gap: 4px; background: var(--surface2); padding: 4px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 2rem; width: fit-content; }
   .pf-tab { padding: 8px 20px; border-radius: 9px; border: none; background: none; color: var(--muted); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; font-weight: 500; transition: all .2s; }
   .pf-tab.active { background: var(--surface); color: var(--text); border: 1px solid var(--border2); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 
-  /* SECTION CARD */
+  /* CARD */
   .pf-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 18px; padding: 1.75rem; margin-bottom: 1.25rem; }
   .pf-card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
   .pf-card-title-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
 
   /* AVATAR HERO */
-  .pf-avatar-hero { display: flex; align-items: center; gap: 1.75rem; margin-bottom: 0; }
-  .pf-avatar-preview { position: relative; flex-shrink: 0; }
-  .pf-avatar-ring { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); padding: 3px; }
-  .pf-avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 40px; overflow: hidden; }
-  .pf-avatar-inner img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-  .pf-avatar-letter { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 38px; color: var(--text); }
+  .pf-avatar-hero { display: flex; align-items: center; gap: 1.75rem; }
   .pf-avatar-actions { display: flex; flex-direction: column; gap: 8px; }
   .pf-avatar-hint { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
 
@@ -56,33 +93,22 @@ const css = `
   .pf-upload-zone { border: 2px dashed var(--border2); border-radius: 12px; padding: 1.25rem; text-align: center; cursor: pointer; transition: all .2s; margin-top: 1.25rem; }
   .pf-upload-zone:hover { border-color: var(--accent); background: rgba(124,92,252,0.04); }
   .pf-upload-zone-text { font-size: 13px; color: var(--muted); margin-top: 6px; }
-  .pf-upload-zone-sub { font-size: 11px; color: var(--muted2); margin-top: 3px; }
+  .pf-upload-zone-sub  { font-size: 11px; color: var(--muted2); margin-top: 3px; }
 
   /* AVATAR GRID */
   .pf-avatar-grid-label { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; margin-top: 1.5rem; }
   .pf-avatar-grid { display: flex; flex-wrap: wrap; gap: 10px; }
-  .pf-avatar-option {
-    width: 52px; height: 52px; border-radius: 14px;
-    background: var(--surface2); border: 2px solid var(--border2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px; cursor: pointer; transition: all .2s;
-    flex-direction: column; gap: 2px;
-  }
+  .pf-avatar-option { width: 52px; height: 52px; border-radius: 14px; background: var(--surface2); border: 2px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; transition: all .2s; flex-direction: column; gap: 2px; }
   .pf-avatar-option:hover { border-color: var(--accent); background: rgba(124,92,252,0.1); transform: scale(1.08); }
   .pf-avatar-option.selected { border-color: var(--accent2); background: rgba(0,229,192,0.1); box-shadow: 0 0 0 3px rgba(0,229,192,0.2); }
   .pf-avatar-option-label { font-size: 8px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
 
-  /* FORM FIELDS */
+  /* FORM */
   .pf-field { margin-bottom: 1.25rem; }
   .pf-field:last-child { margin-bottom: 0; }
   .pf-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 7px; display: flex; align-items: center; justify-content: space-between; }
   .pf-label-tag { font-size: 10px; background: rgba(0,229,192,0.1); color: var(--accent2); border: 1px solid rgba(0,229,192,0.2); border-radius: 6px; padding: 1px 8px; text-transform: none; letter-spacing: 0; font-weight: 500; }
-  .pf-input {
-    width: 100%; background: var(--surface2); border: 1px solid var(--border2);
-    border-radius: 11px; padding: 12px 14px; color: var(--text);
-    font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none;
-    transition: border-color .2s, box-shadow .2s;
-  }
+  .pf-input { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 11px; padding: 12px 14px; color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color .2s, box-shadow .2s; }
   .pf-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,92,252,0.12); }
   .pf-input::placeholder { color: var(--muted); }
   .pf-input:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -92,39 +118,24 @@ const css = `
   .pf-badge-preview { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,179,71,0.1); border: 1px solid rgba(255,179,71,0.25); border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 600; color: var(--amber); margin-top: 8px; }
 
   /* SAVE BAR */
-  .pf-save-bar { position: sticky; bottom: 0; background: rgba(10,11,15,0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border2); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; z-index: 50; }
+  .pf-save-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,11,15,0.97); backdrop-filter: blur(12px); border-top: 1px solid var(--border2); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; z-index: 200; }
   .pf-save-status { font-size: 13px; color: var(--muted); }
-  .pf-save-status.saved { color: var(--accent2); }
   .pf-save-status.changed { color: var(--amber); }
 
-  /* SUCCESS TOAST */
-  .pf-toast {
-    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--surface3); border: 1px solid rgba(0,229,192,0.3);
-    border-radius: 12px; padding: 10px 20px;
-    font-size: 13px; font-weight: 600; color: var(--accent2);
-    display: flex; align-items: center; gap: 8px;
-    opacity: 0; transition: all .3s cubic-bezier(.4,0,.2,1);
-    z-index: 600; white-space: nowrap; pointer-events: none;
-  }
+  /* TOAST */
+  .pf-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface3); border: 1px solid rgba(0,229,192,0.3); border-radius: 12px; padding: 10px 20px; font-size: 13px; font-weight: 600; color: var(--accent2); display: flex; align-items: center; gap: 8px; opacity: 0; transition: all .3s cubic-bezier(.4,0,.2,1); z-index: 600; white-space: nowrap; pointer-events: none; }
   .pf-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   /* DANGER ZONE */
   .pf-danger-zone { border: 1px solid rgba(255,107,107,0.2); border-radius: 14px; padding: 1.25rem; background: rgba(255,107,107,0.03); }
   .pf-danger-title { font-size: 13px; font-weight: 600; color: var(--accent3); margin-bottom: 4px; }
-  .pf-danger-sub { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .pf-danger-sub   { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
 
-  /* STATS OVERVIEW */
-  .pf-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  .pf-stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
-  .pf-stat-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 3px; }
-  .pf-stat-key { font-size: 11px; color: var(--muted); }
-
-  /* PREFERENCE TOGGLES */
+  /* TOGGLES */
   .pf-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
   .pf-toggle-row:last-child { border-bottom: none; }
   .pf-toggle-info strong { font-size: 13px; font-weight: 500; display: block; margin-bottom: 2px; }
-  .pf-toggle-info span { font-size: 12px; color: var(--muted); }
+  .pf-toggle-info span   { font-size: 12px; color: var(--muted); }
   .pf-toggle { width: 44px; height: 24px; border-radius: 12px; background: var(--muted2); border: none; cursor: pointer; position: relative; transition: background .2s; flex-shrink: 0; }
   .pf-toggle.on { background: var(--accent); }
   .pf-toggle::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: transform .2s cubic-bezier(.4,0,.2,1); }
@@ -134,7 +145,6 @@ const css = `
   .pf-fadein { animation: pf-fadein .4s ease forwards; }
 `;
 
-/* ─── Tech Avatars ─── */
 const TECH_AVATARS = [
   { emoji: "🤖", label: "Robot" },
   { emoji: "👾", label: "Alien" },
@@ -157,8 +167,6 @@ const TECH_AVATARS = [
   { emoji: "🌊", label: "Wave" },
   { emoji: "🔮", label: "Crystal" },
 ];
-
-const DIFFICULTY_OPTIONS = ["Easy", "Medium", "Hard"];
 
 /* ─── SVG Icons ─── */
 const IconUser = () => (
@@ -236,94 +244,109 @@ const IconUpload = () => (
   </svg>
 );
 
+/* ─── Avatar renderer (reused in multiple places) ─── */
+export function AvatarRender({ avatar, name, size = 96, fontSize = 38 }) {
+  const inner = avatar ? (
+    avatar.startsWith("data:") || avatar.startsWith("http") ? (
+      <img
+        src={avatar}
+        alt="avatar"
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          borderRadius: "50%",
+        }}
+      />
+    ) : (
+      <span style={{ fontSize }}>{avatar}</span>
+    )
+  ) : (
+    <span
+      style={{
+        fontFamily: "Syne,sans-serif",
+        fontWeight: 800,
+        fontSize,
+        color: "#F0EFF8",
+      }}
+    >
+      {(name || "U")[0].toUpperCase()}
+    </span>
+  );
+
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: "linear-gradient(135deg,#7C5CFC,#00E5C0)",
+        padding: 3,
+        flexShrink: 0,
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          borderRadius: "50%",
+          background: "var(--surface,#111318)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+        }}
+      >
+        {inner}
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════
+   MAIN COMPONENT
+════════════════════════════════════ */
 export default function Profile() {
   const navigate = useNavigate();
   const location = useLocation();
   const fileRef = useRef(null);
 
-  /* ── determine initial tab from query param ── */
   const params = new URLSearchParams(location.search);
   const initTab = params.get("tab") || "profile";
+
+  /* load initial values directly from storage — no useEffect needed */
+  const initial = readProfile();
 
   const [activeTab, setActiveTab] = useState(initTab);
   const [toast, setToast] = useState(false);
   const [hasChange, setHasChange] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  /* ── load stored user data ── */
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  /* profile fields */
+  const [name, setName] = useState(initial.name);
+  const [nickname, setNickname] = useState(initial.nickname);
+  const [bio, setBio] = useState(initial.bio);
+  const [avatar, setAvatar] = useState(initial.avatar);
+  const [education, setEducation] = useState(initial.educationLevel);
+  const [contact, setContact] = useState(initial.contactNumber);
 
-  /* ── profile state ── */
-  const [name, setName] = useState(storedUser.name || "");
-  const [nickname, setNickname] = useState(
-    localStorage.getItem("bb_nickname") || "",
-  );
-  const [bio, setBio] = useState(localStorage.getItem("bb_bio") || "");
-  const [avatar, setAvatar] = useState(localStorage.getItem("bb_avatar") || "");
-  const [education, setEducation] = useState(storedUser.educationLevel || "");
-  const [contact, setContact] = useState(storedUser.contactNumber || "");
+  /* preference fields */
+  const [defaultDiff, setDefaultDiff] = useState(initial.defaultDiff);
+  const [instantFB, setInstantFB] = useState(initial.instantFB);
+  const [shuffleQ, setShuffleQ] = useState(initial.shuffleQ);
+  const [showStreak, setShowStreak] = useState(initial.showStreak);
+  const [emailNotif, setEmailNotif] = useState(initial.emailNotif);
 
-  /* ── preferences state ── */
-  const [defaultDiff, setDefaultDiff] = useState(
-    localStorage.getItem("bb_defaultDiff") || "Medium",
-  );
-  const [instantFB, setInstantFB] = useState(
-    localStorage.getItem("bb_instantFB") !== "false",
-  );
-  const [shuffleQ, setShuffleQ] = useState(
-    localStorage.getItem("bb_shuffleQ") !== "false",
-  );
-  const [showStreak, setShowStreak] = useState(
-    localStorage.getItem("bb_showStreak") !== "false",
-  );
-  const [emailNotif, setEmailNotif] = useState(
-    localStorage.getItem("bb_emailNotif") === "true",
-  );
+  /* helper — mark changed without useEffect (avoids firing on mount) */
+  const markChanged = useCallback(() => setHasChange(true), []);
 
-  /* mark changed whenever any field updates */
-  useEffect(() => {
-    setHasChange(true);
-  }, [
-    name,
-    nickname,
-    bio,
-    avatar,
-    defaultDiff,
-    instantFB,
-    shuffleQ,
-    showStreak,
-    emailNotif,
-    education,
-    contact,
-  ]);
-
-  const showToast = () => {
-    setToast(true);
-    setTimeout(() => setToast(false), 2500);
+  const field = (setter) => (e) => {
+    setter(e.target.value);
+    markChanged();
   };
-
-  const handleSave = async () => {
-    setSaving(true);
-    /* save to localStorage (UI layer) */
-    localStorage.setItem("bb_nickname", nickname);
-    localStorage.setItem("bb_bio", bio);
-    localStorage.setItem("bb_avatar", avatar);
-    localStorage.setItem("bb_defaultDiff", defaultDiff);
-    localStorage.setItem("bb_instantFB", String(instantFB));
-    localStorage.setItem("bb_shuffleQ", String(shuffleQ));
-    localStorage.setItem("bb_showStreak", String(showStreak));
-    localStorage.setItem("bb_emailNotif", String(emailNotif));
-
-    /* update user name in localStorage if changed */
-    const updatedUser = { ...storedUser, name };
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-
-    /* TODO: call PATCH /api/user/profile for backend persistence */
-
-    await new Promise((r) => setTimeout(r, 600)); // simulate network
-    setSaving(false);
-    setHasChange(false);
-    showToast();
+  const toggle = (state, setter) => () => {
+    setter(!state);
+    markChanged();
   };
 
   /* ── image upload ── */
@@ -337,69 +360,50 @@ export default function Profile() {
     const reader = new FileReader();
     reader.onload = () => {
       setAvatar(reader.result);
-      setHasChange(true);
+      markChanged();
     };
     reader.readAsDataURL(file);
   };
 
-  const selectAvatarEmoji = (emoji) => {
-    setAvatar(emoji);
-    setHasChange(true);
+  /* ── save — writes everything to localStorage at once ── */
+  const handleSave = async () => {
+    setSaving(true);
+    writeProfile({
+      name,
+      nickname,
+      bio,
+      avatar,
+      education: education,
+      contactNumber: contact,
+      defaultDiff,
+      instantFB,
+      shuffleQ,
+      showStreak,
+      emailNotif,
+    });
+    await new Promise((r) => setTimeout(r, 500));
+    setSaving(false);
+    setHasChange(false);
+    setToast(true);
+    setTimeout(() => setToast(false), 2500);
   };
 
-  /* ── avatar display ── */
-  const AvatarDisplay = ({ size = 96, fontSize = 40 }) => (
-    <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: "50%",
-        background: "linear-gradient(135deg, #7C5CFC, #00E5C0)",
-        padding: 3,
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          borderRadius: "50%",
-          background: "var(--surface)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-        }}
-      >
-        {avatar ? (
-          avatar.startsWith("data:") || avatar.startsWith("http") ? (
-            <img
-              src={avatar}
-              alt="avatar"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                borderRadius: "50%",
-              }}
-            />
-          ) : (
-            <span style={{ fontSize }}>{avatar}</span>
-          )
-        ) : (
-          <span
-            style={{
-              fontFamily: "Syne,sans-serif",
-              fontWeight: 800,
-              fontSize,
-              color: "#F0EFF8",
-            }}
-          >
-            {(name || "U")[0].toUpperCase()}
-          </span>
-        )}
-      </div>
-    </div>
-  );
+  /* ── discard changes ── */
+  const handleCancel = () => {
+    const fresh = readProfile();
+    setName(fresh.name);
+    setNickname(fresh.nickname);
+    setBio(fresh.bio);
+    setAvatar(fresh.avatar);
+    setEducation(fresh.educationLevel);
+    setContact(fresh.contactNumber);
+    setDefaultDiff(fresh.defaultDiff);
+    setInstantFB(fresh.instantFB);
+    setShuffleQ(fresh.shuffleQ);
+    setShowStreak(fresh.showStreak);
+    setEmailNotif(fresh.emailNotif);
+    setHasChange(false);
+  };
 
   return (
     <>
@@ -467,13 +471,9 @@ export default function Profile() {
           {/* TABS */}
           <div className="pf-tabs">
             {[
-              { id: "profile", label: "Profile", icon: <IconUser /> },
-              {
-                id: "preferences",
-                label: "Preferences",
-                icon: <IconSettings />,
-              },
-              { id: "security", label: "Security", icon: <IconShield /> },
+              { id: "profile", label: "Profile" },
+              { id: "preferences", label: "Preferences" },
+              { id: "security", label: "Security" },
             ].map((t) => (
               <button
                 key={t.id}
@@ -485,7 +485,7 @@ export default function Profile() {
             ))}
           </div>
 
-          {/* ═══ TAB: PROFILE ═══ */}
+          {/* ══ PROFILE TAB ══ */}
           {activeTab === "profile" && (
             <div>
               {/* AVATAR CARD */}
@@ -503,11 +503,14 @@ export default function Profile() {
                   Profile Picture
                 </div>
 
-                {/* CURRENT AVATAR + ACTIONS */}
                 <div className="pf-avatar-hero">
-                  <div className="pf-avatar-preview">
-                    <AvatarDisplay size={96} fontSize={40} />
-                  </div>
+                  {/* live preview — reads from state, not localStorage */}
+                  <AvatarRender
+                    avatar={avatar}
+                    name={name}
+                    size={96}
+                    fontSize={38}
+                  />
                   <div className="pf-avatar-actions">
                     <button
                       className="pf-btn pf-btn-ghost"
@@ -522,7 +525,7 @@ export default function Profile() {
                         style={{ fontSize: 13 }}
                         onClick={() => {
                           setAvatar("");
-                          setHasChange(true);
+                          markChanged();
                         }}
                       >
                         Remove
@@ -543,7 +546,6 @@ export default function Profile() {
                   </div>
                 </div>
 
-                {/* UPLOAD ZONE */}
                 <div
                   className="pf-upload-zone"
                   onClick={() => fileRef.current?.click()}
@@ -557,14 +559,16 @@ export default function Profile() {
                   </div>
                 </div>
 
-                {/* AVATAR PICKER */}
                 <div className="pf-avatar-grid-label">Tech Avatars</div>
                 <div className="pf-avatar-grid">
                   {TECH_AVATARS.map((a, i) => (
                     <div
                       key={i}
                       className={`pf-avatar-option${avatar === a.emoji ? " selected" : ""}`}
-                      onClick={() => selectAvatarEmoji(a.emoji)}
+                      onClick={() => {
+                        setAvatar(a.emoji);
+                        markChanged();
+                      }}
                       title={a.label}
                     >
                       <span style={{ fontSize: 26 }}>{a.emoji}</span>
@@ -591,35 +595,36 @@ export default function Profile() {
 
                 <div className="pf-field">
                   <div className="pf-label">
-                    Full Name
+                    Full Name{" "}
                     <span className="pf-label-tag">Displayed on reports</span>
                   </div>
                   <input
                     className="pf-input"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={field(setName)}
                     placeholder="Your full name"
                   />
                 </div>
 
                 <div className="pf-field">
                   <div className="pf-label">
-                    Nickname
+                    Nickname{" "}
                     <span className="pf-label-tag">Shown on Dashboard</span>
                   </div>
                   <input
                     className="pf-input"
                     value={nickname}
-                    onChange={(e) => setNickname(e.target.value)}
+                    onChange={field(setNickname)}
                     placeholder="e.g. BrainMaster, Arjun99"
                     maxLength={20}
                   />
                   <div className="pf-input-hint">
-                    This will replace your name on the dashboard greeting.
+                    This replaces your name in the dashboard greeting.
                   </div>
                   {nickname && (
                     <div className="pf-badge-preview">
-                      {avatar || "👤"} &nbsp;Welcome back, {nickname}!
+                      {avatar && !avatar.startsWith("data:") ? avatar : "👤"}
+                      &nbsp; Welcome back, {nickname}!
                     </div>
                   )}
                 </div>
@@ -629,8 +634,8 @@ export default function Profile() {
                   <textarea
                     className="pf-input"
                     value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    placeholder="Tell something about yourself... (appears on your public profile)"
+                    onChange={field(setBio)}
+                    placeholder="Tell something about yourself..."
                     rows={3}
                     maxLength={160}
                     style={{ resize: "vertical", minHeight: 80 }}
@@ -642,12 +647,7 @@ export default function Profile() {
 
                 <div className="pf-field">
                   <div className="pf-label">Email Address</div>
-                  <input
-                    className="pf-input"
-                    value={storedUser.email || ""}
-                    disabled
-                    placeholder="email@example.com"
-                  />
+                  <input className="pf-input" value={initial.email} disabled />
                   <div className="pf-input-hint">
                     Email cannot be changed. Contact support if needed.
                   </div>
@@ -665,8 +665,8 @@ export default function Profile() {
                     <input
                       className="pf-input"
                       value={contact}
-                      onChange={(e) => setContact(e.target.value)}
-                      placeholder="10-digit mobile number"
+                      onChange={field(setContact)}
+                      placeholder="10-digit mobile"
                       maxLength={10}
                     />
                   </div>
@@ -675,7 +675,7 @@ export default function Profile() {
                     <select
                       className="pf-input"
                       value={education}
-                      onChange={(e) => setEducation(e.target.value)}
+                      onChange={field(setEducation)}
                       style={{ cursor: "pointer" }}
                     >
                       <option value="">Select level</option>
@@ -697,7 +697,7 @@ export default function Profile() {
             </div>
           )}
 
-          {/* ═══ TAB: PREFERENCES ═══ */}
+          {/* ══ PREFERENCES TAB ══ */}
           {activeTab === "preferences" && (
             <div>
               <div className="pf-card">
@@ -711,38 +711,34 @@ export default function Profile() {
                   >
                     <IconSettings />
                   </div>
-                  Quiz Defaults
+                  Default Difficulty
                 </div>
-
-                <div className="pf-field">
-                  <div className="pf-label">Default Difficulty</div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    {DIFFICULTY_OPTIONS.map((d) => (
-                      <button
-                        key={d}
-                        className="pf-btn"
-                        style={{
-                          flex: 1,
-                          background:
-                            defaultDiff === d
-                              ? "var(--accent)"
-                              : "var(--surface2)",
-                          color: defaultDiff === d ? "#fff" : "var(--muted)",
-                          border: `1px solid ${defaultDiff === d ? "var(--accent)" : "var(--border2)"}`,
-                          fontSize: 13,
-                        }}
-                        onClick={() => {
-                          setDefaultDiff(d);
-                          setHasChange(true);
-                        }}
-                      >
-                        {d}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="pf-input-hint">
-                    QuizSetup will pre-select this difficulty for you.
-                  </div>
+                <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                  {["Easy", "Medium", "Hard"].map((d) => (
+                    <button
+                      key={d}
+                      className="pf-btn"
+                      style={{
+                        flex: 1,
+                        background:
+                          defaultDiff === d
+                            ? "var(--accent)"
+                            : "var(--surface2)",
+                        color: defaultDiff === d ? "#fff" : "var(--muted)",
+                        border: `1px solid ${defaultDiff === d ? "var(--accent)" : "var(--border2)"}`,
+                        fontSize: 13,
+                      }}
+                      onClick={() => {
+                        setDefaultDiff(d);
+                        markChanged();
+                      }}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+                <div className="pf-input-hint">
+                  QuizSetup will pre-select this difficulty for you.
                 </div>
               </div>
 
@@ -759,7 +755,6 @@ export default function Profile() {
                   </div>
                   Quiz Options
                 </div>
-
                 {[
                   {
                     label: "Instant Feedback",
@@ -775,7 +770,7 @@ export default function Profile() {
                   },
                   {
                     label: "Show Streak on Nav",
-                    desc: "Display your active streak in the navigation bar",
+                    desc: "Display your active streak in the navbar",
                     state: showStreak,
                     set: setShowStreak,
                   },
@@ -793,10 +788,7 @@ export default function Profile() {
                     </div>
                     <button
                       className={`pf-toggle${item.state ? " on" : ""}`}
-                      onClick={() => {
-                        item.set(!item.state);
-                        setHasChange(true);
-                      }}
+                      onClick={toggle(item.state, item.set)}
                     />
                   </div>
                 ))}
@@ -804,7 +796,7 @@ export default function Profile() {
             </div>
           )}
 
-          {/* ═══ TAB: SECURITY ═══ */}
+          {/* ══ SECURITY TAB ══ */}
           {activeTab === "security" && (
             <div>
               <div className="pf-card">
@@ -820,7 +812,6 @@ export default function Profile() {
                   </div>
                   Change Password
                 </div>
-
                 <div className="pf-field">
                   <div className="pf-label">Current Password</div>
                   <input
@@ -866,43 +857,31 @@ export default function Profile() {
                   </div>
                   Account Info
                 </div>
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 0 }}
-                >
-                  {[
-                    {
-                      label: "Account ID",
-                      val: storedUser._id?.slice(-8) || "—",
-                    },
-                    {
-                      label: "Member since",
-                      val: storedUser.createdAt
-                        ? new Date(storedUser.createdAt).toLocaleDateString(
-                            "en-IN",
-                            { month: "long", year: "numeric" },
-                          )
-                        : "—",
-                    },
-                    {
-                      label: "Education Level",
-                      val: storedUser.educationLevel || "—",
-                    },
-                  ].map((r, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        padding: "10px 0",
-                        borderBottom: "1px solid var(--border)",
-                        fontSize: 13,
-                      }}
-                    >
-                      <span style={{ color: "var(--muted)" }}>{r.label}</span>
-                      <span style={{ fontWeight: 600 }}>{r.val}</span>
-                    </div>
-                  ))}
-                </div>
+                {[
+                  {
+                    label: "Account ID",
+                    val: initial.email?.split("@")[0] || "—",
+                  },
+                  {
+                    label: "Education Level",
+                    val: initial.educationLevel || "—",
+                  },
+                  { label: "Contact", val: initial.contactNumber || "—" },
+                ].map((r, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "10px 0",
+                      borderBottom: "1px solid var(--border)",
+                      fontSize: 13,
+                    }}
+                  >
+                    <span style={{ color: "var(--muted)" }}>{r.label}</span>
+                    <span style={{ fontWeight: 600 }}>{r.val}</span>
+                  </div>
+                ))}
               </div>
 
               <div className="pf-card">
@@ -916,7 +895,7 @@ export default function Profile() {
                   <div className="pf-danger-title">Delete Account</div>
                   <div className="pf-danger-sub">
                     Permanently delete your account and all quiz history. This
-                    action cannot be undone.
+                    cannot be undone.
                   </div>
                   <button
                     className="pf-btn pf-btn-danger"
@@ -932,7 +911,7 @@ export default function Profile() {
           )}
         </main>
 
-        {/* SAVE BAR */}
+        {/* SAVE BAR — fixed at bottom */}
         <div className="pf-save-bar">
           <div className={`pf-save-status${hasChange ? " changed" : ""}`}>
             {hasChange ? "You have unsaved changes" : "All changes saved"}
@@ -940,9 +919,10 @@ export default function Profile() {
           <div style={{ display: "flex", gap: 10 }}>
             <button
               className="pf-btn pf-btn-ghost"
-              onClick={() => navigate("/dashboard")}
+              onClick={handleCancel}
+              disabled={!hasChange}
             >
-              Cancel
+              Discard
             </button>
             <button
               className="pf-btn pf-btn-primary"

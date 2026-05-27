@@ -53,6 +53,24 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
+    /* ── PROFILE ── */
+    nickname: {
+      type: String,
+      trim: true,
+      maxlength: 20,
+      default: "",
+    },
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: 160,
+      default: "",
+    },
+    avatar: {
+      type: String,
+      default: "",
+    },
+
     /* ── XP & STREAK ── */
     xp: {
       type: Number,

@@ -71,6 +71,10 @@ export const loginUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        nickname: user.nickname || "",
+        avatar: user.avatar || "",
+        contactNumber: user.contactNumber || "",
+        educationLevel: user.educationLevel || "",
         token: token,
       });
     } else {

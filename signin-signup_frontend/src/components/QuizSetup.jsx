@@ -10,7 +10,12 @@ const css = `
     --accent: #7C5CFC; --accent2: #00E5C0; --accent3: #FF6B6B;
     --amber: #FFB347; --text: #F0EFF8; --muted: #7B7A8C; --muted2: #3A394A;
   }
-  .bb-root { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  [data-theme="light"] {
+    --bg: #F5F5FA; --surface: #FFFFFF; --surface2: #F0EFF8;
+    --border: rgba(0,0,0,0.07); --border2: rgba(0,0,0,0.12);
+    --text: #0A0B0F; --muted: #7B7A8C; --muted2: #C8C7D4;
+  }
+  .bb-root { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
 
   /* STEPPER */
   .bb-stepper-wrap { display: flex; align-items: center; justify-content: center; padding: 2rem 2rem 0; }
@@ -120,6 +125,7 @@ const css = `
   .bb-btn-primary:hover { background: #9074fd; transform: translateY(-1px); }
   .bb-btn-primary:disabled { background: var(--muted2); color: var(--muted); cursor: not-allowed; transform: none; }
   .bb-btn-ghost { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border2); }
+  [data-theme="light"] .bb-btn-ghost { background: rgba(0,0,0,0.04); }
   .bb-btn-ghost:hover { background: rgba(255,255,255,0.09); }
   .bb-btn-start { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0A0B0F; flex: 1; font-size: 15px; }
   .bb-btn-start:hover { opacity: .9; transform: translateY(-1px); }

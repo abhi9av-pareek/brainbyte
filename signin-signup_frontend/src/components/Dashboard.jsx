@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../contexts/ThemeContext";
 
 /* ─── CSS ─── */
 const css = `
@@ -11,10 +12,16 @@ const css = `
     --bb-accent: #7C5CFC; --bb-accent2: #00E5C0; --bb-accent3: #FF6B6B;
     --bb-amber: #FFB347; --bb-text: #F0EFF8; --bb-muted: #7B7A8C; --bb-muted2: #4A495A;
   }
-  .bb-root { font-family: 'DM Sans', sans-serif; background: var(--bb-bg); color: var(--bb-text); min-height: 100vh; }
+  [data-theme="light"] {
+    --bb-bg: #F5F5FA; --bb-surface: #FFFFFF; --bb-surface2: #F0EFF8;
+    --bb-border: rgba(0,0,0,0.07); --bb-border2: rgba(0,0,0,0.12);
+    --bb-text: #0A0B0F; --bb-muted: #7B7A8C; --bb-muted2: #C8C7D4;
+  }
+  .bb-root { font-family: 'DM Sans', sans-serif; background: var(--bb-bg); color: var(--bb-text); min-height: 100vh; transition: background .3s, color .3s; }
 
   /* NAV */
-  .bb-nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 1px solid var(--bb-border); background: rgba(10,11,15,0.95); position: sticky; top: 0; z-index: 100; }
+  .bb-nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 1px solid var(--bb-border); background: rgba(10,11,15,0.95); position: sticky; top: 0; z-index: 100; transition: background .3s; }
+  [data-theme="light"] .bb-nav { background: rgba(245,245,250,0.95); }
   .bb-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
   .bb-logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--bb-accent), var(--bb-accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
   .bb-logo span { color: var(--bb-accent2); }
@@ -24,7 +31,7 @@ const css = `
   .bb-nav-links a.active { color: var(--bb-accent2); }
   .bb-nav-right { display: flex; align-items: center; gap: 12px; }
   .bb-streak { display: flex; align-items: center; gap: 6px; background: rgba(255,179,71,0.12); border: 1px solid rgba(255,179,71,0.25); border-radius: 20px; padding: 5px 12px; font-size: 13px; font-weight: 500; color: var(--bb-amber); }
-  .bb-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--bb-accent), #FF6B6B); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .bb-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--bb-accent), #FF6B6B); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; overflow: hidden; }
 
   /* MAIN */
   .bb-main { padding: 2rem 2rem 4rem; max-width: 1200px; margin: 0 auto; }
@@ -34,7 +41,7 @@ const css = `
   .bb-spinner { width: 20px; height: 20px; border: 2px solid var(--bb-border2); border-top-color: var(--bb-accent); border-radius: 50%; animation: bb-spin 0.7s linear infinite; }
 
   /* HERO */
-  .bb-hero { background: var(--bb-surface); border: 1px solid var(--bb-border2); border-radius: 20px; padding: 2.5rem; margin-bottom: 2rem; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; }
+  .bb-hero { background: var(--bb-surface); border: 1px solid var(--bb-border2); border-radius: 20px; padding: 2.5rem; margin-bottom: 2rem; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; transition: background .3s; }
   .bb-hero::before { content: ''; position: absolute; right: -80px; top: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(124,92,252,0.18) 0%, transparent 70%); pointer-events: none; }
   .bb-hero::after { content: ''; position: absolute; right: 80px; bottom: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,229,192,0.12) 0%, transparent 70%); pointer-events: none; }
   .bb-hero-text h1 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
@@ -91,7 +98,7 @@ const css = `
   .icon-pink   { background: rgba(255,100,180,0.13); }
   .bb-subject-card h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
   .bb-subject-card p { font-size: 12px; color: var(--bb-muted); margin-bottom: 14px; }
-  .bb-progress-bar { height: 4px; background: rgba(255,255,255,0.07); border-radius: 4px; margin-bottom: 6px; }
+  .bb-progress-bar { height: 4px; background: var(--bb-muted2); border-radius: 4px; margin-bottom: 6px; }
   .bb-progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
   .fill-purple { background: var(--bb-accent); }
   .fill-teal   { background: var(--bb-accent2); }
@@ -156,7 +163,12 @@ const css = `
 
   /* SIDEBAR */
   .bb-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
-  .bb-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 320px; background: var(--bb-surface); border-left: 1px solid var(--bb-border); z-index: 50; transition: transform 0.3s; }
+  [data-theme="light"] .bb-backdrop { background: rgba(0,0,0,0.25); }
+  .bb-sidebar { position: fixed; top: 0; right: 0; height: 100%; width: 320px; background: var(--bb-surface); border-left: 1px solid var(--bb-border); z-index: 50; transition: transform 0.3s, background .3s; }
+
+  /* THEME TOGGLE */
+  .bb-theme-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--bb-surface2); border: 1px solid var(--bb-border2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; color: var(--bb-muted); }
+  .bb-theme-btn:hover { border-color: var(--bb-accent); color: var(--bb-accent); }
   .bb-sidebar.open   { transform: translateX(0); }
   .bb-sidebar.closed { transform: translateX(100%); }
   .bb-sidebar-header { padding: 1.25rem; border-bottom: 1px solid var(--bb-border); display: flex; justify-content: space-between; align-items: center; }
@@ -244,8 +256,9 @@ const TOP3 = [];
 ════════════════════════════════════════════════ */
 function Dashboard() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [openProfile, setOpenProfile] = useState(false);
-  const [user, setUser] = useState({ name: "User", streak: 0, email: "" });
+  const [user, setUser] = useState({ name: "User", streak: 0, email: "", avatar: "" });
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("today");
@@ -266,6 +279,7 @@ function Dashboard() {
         name: parsedUser.name || "User",
         email: parsedUser.email || "",
         streak: parsedUser.streak || 0,
+        avatar: parsedUser.avatar || "",
       });
     }
 
@@ -366,13 +380,32 @@ function Dashboard() {
 
           <div className="bb-nav-right">
             <div className="bb-streak">🔥 {user.streak} day streak</div>
+            <button
+              className="bb-theme-btn"
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {theme === "dark" ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+              )}
+            </button>
 
             <div
               className="bb-avatar"
               onClick={() => setOpenProfile(true)}
               style={{ cursor: "pointer" }}
             >
-              {user.name[0]}
+              {user.avatar ? (
+                user.avatar.startsWith("data:") || user.avatar.startsWith("http") ? (
+                  <img src={user.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+                ) : (
+                  <span style={{ fontSize: 18 }}>{user.avatar}</span>
+                )
+              ) : (
+                user.name[0]
+              )}
             </div>
           </div>
         </nav>

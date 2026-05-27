@@ -11,10 +11,16 @@ const css = `
     --accent: #7C5CFC; --accent2: #00E5C0; --accent3: #FF6B6B;
     --amber: #FFB347; --text: #F0EFF8; --muted: #7B7A8C; --muted2: #3A394A;
   }
-  .rs-root { font-family: 'DM  Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  [data-theme="light"] {
+    --bg: #F5F5FA; --surface: #FFFFFF; --surface2: #F0EFF8;
+    --border: rgba(0,0,0,0.07); --border2: rgba(0,0,0,0.12);
+    --text: #0A0B0F; --muted: #7B7A8C; --muted2: #C8C7D4;
+  }
+  .rs-root { font-family: 'DM  Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
 
   /* NAV */
-  .rs-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 56px; border-bottom: 1px solid var(--border); background: rgba(10,11,15,0.97); position: sticky; top: 0; z-index: 100; }
+  .rs-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 56px; border-bottom: 1px solid var(--border); background: rgba(10,11,15,0.97); position: sticky; top: 0; z-index: 100; transition: background .3s; }
+  [data-theme="light"] .rs-nav { background: rgba(245,245,250,0.95); }
   .rs-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 19px; display: flex; align-items: center; gap: 8px; }
   .rs-logo-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
   .rs-logo span { color: var(--accent2); }
@@ -25,6 +31,7 @@ const css = `
   .rs-btn-primary { background: var(--accent); color: #fff; }
   .rs-btn-primary:hover { background: #9074fd; transform: translateY(-1px); }
   .rs-btn-ghost { background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid var(--border2); }
+  [data-theme="light"] .rs-btn-ghost { background: rgba(0,0,0,0.04); }
   .rs-btn-ghost:hover { background: rgba(255,255,255,0.1); }
   .rs-btn-start { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0A0B0F; font-size: 15px; padding: 13px 32px; }
   .rs-btn-start:hover { opacity: .9; transform: translateY(-1px); }
@@ -79,7 +86,7 @@ const css = `
   .rs-topic-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
   .rs-topic-name { font-size: 13px; font-weight: 500; }
   .rs-topic-score { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; }
-  .rs-bar-track { height: 8px; background: rgba(255,255,255,0.07); border-radius: 8px; overflow: hidden; }
+  .rs-bar-track { height: 8px; background: var(--muted2); border-radius: 8px; overflow: hidden; }
   .rs-bar-fill { height: 100%; border-radius: 8px; transition: width 1s cubic-bezier(.4,0,.2,1); }
   .bar-great  { background: var(--accent2); }
   .bar-good   { background: var(--accent); }
