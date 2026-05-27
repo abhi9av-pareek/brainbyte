@@ -27,7 +27,8 @@ app.use(
       // allow requests with no origin (mobile apps, curl, Postman)
       if (!origin) return callback(null, true);
       const allowed = [
-        "https://gyantra.netlify.app",
+        "https://brainnbyte.netlify.app",  // current live deployment
+        "https://gyantra.netlify.app",     // future renamed deployment
         "http://localhost:5173",
         "http://localhost:5174",
       ];

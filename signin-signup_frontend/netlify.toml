@@ -1,6 +1,6 @@
 [[redirects]]
   from = "/api/*"
-  to = "https://gyantra-qogq.onrender.com/api/:splat"
+  to = "https://brainbyte-qogq.onrender.com/api/:splat"
   status = 200
   force = true
 
