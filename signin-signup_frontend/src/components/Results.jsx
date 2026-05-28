@@ -22,7 +22,10 @@ const css = `
   .rs-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 56px; border-bottom: 1px solid var(--border); background: rgba(10,11,15,0.97); position: sticky; top: 0; z-index: 100; transition: background .3s; }
   [data-theme="light"] .rs-nav { background: rgba(245,245,250,0.95); }
   .rs-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 19px; display: flex; align-items: center; gap: 8px; }
-  .rs-logo-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .rs-logo-icon { width: 28px; height: 28px; border-radius: 7px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .rs-logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rs-footer { border-top: 1px solid var(--border); padding: 1rem 2rem; text-align: center; font-size: 11px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 5px; background: var(--bg); }
+  .rs-footer img { width: 14px; height: 14px; border-radius: 3px; }
   .rs-logo span { color: var(--accent2); }
   .rs-nav-right { display: flex; gap: 10px; }
 
@@ -399,7 +402,7 @@ export default function Results() {
         {/* NAV */}
         <nav className="rs-nav">
           <div className="rs-logo">
-            <div className="rs-logo-icon">🧠</div>
+            <div className="rs-logo-icon"><img src="/favicon-32.png" alt="Gyantra" /></div>
             Gyan<span>tra</span>
           </div>
           <div className="rs-nav-right">
@@ -725,6 +728,11 @@ export default function Results() {
             </div>
           </div>
         </main>
+
+        <footer className="rs-footer">
+          <img src="/favicon-32.png" alt="" />
+          © {new Date().getFullYear()} Gyantra. All rights reserved.
+        </footer>
       </div>
     </>
   );

@@ -34,7 +34,10 @@ const css = `
   .qz-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 56px; border-bottom: 1px solid var(--border); background: rgba(10,11,15,0.97); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; transition: background .3s; }
   [data-theme="light"] .qz-nav { background: rgba(245,245,250,0.92); }
   .qz-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 19px; display: flex; align-items: center; gap: 8px; }
-  .qz-logo-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .qz-logo-icon { width: 28px; height: 28px; border-radius: 7px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .qz-logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .qz-footer { border-top: 1px solid var(--border); padding: 1rem 2rem; text-align: center; font-size: 11px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 5px; }
+  .qz-footer img { width: 14px; height: 14px; border-radius: 3px; }
   .qz-logo span { color: var(--accent2); }
   .qz-nav-meta { display: flex; align-items: center; gap: 16px; }
   .qz-nav-tag { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
@@ -525,7 +528,7 @@ export default function Quiz() {
         {/* ── NAV ── */}
         <nav className="qz-nav">
           <div className="qz-logo">
-            <div className="qz-logo-icon">🧠</div>
+            <div className="qz-logo-icon"><img src="/favicon-32.png" alt="Gyantra" /></div>
             Gyan<span>tra</span>
           </div>
           <div className="qz-nav-meta">

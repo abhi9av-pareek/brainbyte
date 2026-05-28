@@ -142,7 +142,10 @@ const css = `
     backdrop-filter: blur(12px);
   }
   .pf-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 19px; display: flex; align-items: center; gap: 9px; cursor: pointer; text-decoration: none; color: var(--text); }
-  .pf-logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .pf-logo-icon { width: 30px; height: 30px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pf-logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pf-footer { border-top: 1px solid var(--border); padding: 1rem 2rem; text-align: center; font-size: 11px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 5px; background: var(--bg); }
+  .pf-footer img { width: 14px; height: 14px; border-radius: 3px; }
   .pf-logo span { color: var(--accent2); }
 
   /* BUTTONS */
@@ -547,7 +550,7 @@ export default function Profile() {
         <style>{css}</style>
         <div className="pf-root">
           <nav className="pf-nav">
-            <div className="pf-logo"><div className="pf-logo-icon" />&nbsp;Gyan<span>tra</span></div>
+            <div className="pf-logo"><div className="pf-logo-icon"><img src="/favicon-32.png" alt="" /></div>&nbsp;Gyan<span>tra</span></div>
           </nav>
           <main className="pf-main">
             {[1,2,3].map(i => (
@@ -1014,6 +1017,11 @@ export default function Profile() {
         <div className={`pf-toast${toast.show ? " show" : ""}${toast.error ? " error" : ""}`}>
           {toast.error ? <IconX size={14} /> : <IconCheck size={14} />} {toast.msg}
         </div>
+
+        <footer className="pf-footer">
+          <img src="/favicon-32.png" alt="" />
+          © {new Date().getFullYear()} Gyantra. All rights reserved.
+        </footer>
       </div>
     </>
   );

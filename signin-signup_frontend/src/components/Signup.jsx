@@ -457,6 +457,10 @@ function Signup() {
           animation: float 3s ease-in-out infinite;
         }
       `}</style>
+      <footer style={{textAlign:'center',padding:'1rem',fontSize:'11px',color:'rgba(255,255,255,0.22)',display:'flex',alignItems:'center',justifyContent:'center',gap:'5px',background:'#0f172a',borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+        <img src="/favicon-32.png" alt="" style={{width:14,height:14,borderRadius:3,verticalAlign:'middle'}} />
+        © {new Date().getFullYear()} Gyantra. All rights reserved.
+      </footer>
     </div>
   );
 }

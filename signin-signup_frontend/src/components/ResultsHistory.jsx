@@ -24,7 +24,10 @@ const css = `
   .rh-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 56px; border-bottom: 1px solid var(--border); background: rgba(10,11,15,0.97); position: sticky; top: 0; z-index: 100; transition: background .3s; }
   [data-theme="light"] .rh-nav { background: rgba(245,245,250,0.95); }
   .rh-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 19px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-  .rh-logo-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .rh-logo-icon { width: 28px; height: 28px; border-radius: 7px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .rh-logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rh-footer { border-top: 1px solid var(--border); padding: 1rem 2rem; text-align: center; font-size: 11px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 5px; background: var(--bg); }
+  .rh-footer img { width: 14px; height: 14px; border-radius: 3px; }
   .rh-logo span { color: var(--accent2); }
   .rh-nav-links { display: flex; gap: 2rem; list-style: none; }
   .rh-nav-links a { font-size: 14px; color: var(--muted); text-decoration: none; font-weight: 500; cursor: pointer; transition: color .2s; }
@@ -196,7 +199,7 @@ export default function ResultsHistory() {
         {/* NAV */}
         <nav className="rh-nav">
           <div className="rh-logo" onClick={() => navigate("/dashboard")}>
-            <div className="rh-logo-icon">🧠</div>
+            <div className="rh-logo-icon"><img src="/favicon-32.png" alt="Gyantra" /></div>
             Gyan<span>tra</span>
           </div>
           <ul className="rh-nav-links">
@@ -376,6 +379,11 @@ export default function ResultsHistory() {
             })
           )}
         </main>
+
+        <footer className="rh-footer">
+          <img src="/favicon-32.png" alt="" />
+          © {new Date().getFullYear()} Gyantra. All rights reserved.
+        </footer>
       </div>
     </>
   );

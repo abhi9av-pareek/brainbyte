@@ -9,21 +9,25 @@ import ResultsHistory from "./components/ResultsHistory";
 import Results from "./components/Results";
 import Analytics from "./components/Analytics";
 import Profile from "./components/Profile";
+import GyantraLanding from "./components/GyantraLanding";
 
 function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LoginModern />} />
-          <Route path="/signup" element={<Signup />} />
+          {/* Landing page is the entry point */}
+          <Route path="/"          element={<GyantraLanding />} />
+          <Route path="/landing"   element={<GyantraLanding />} />
+          <Route path="/login"     element={<LoginModern />} />
+          <Route path="/signup"    element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/QuizSetup" element={<QuizSetup />} />
-          <Route path="/quiz" element={<Quiz />} />
-          <Route path="/results" element={<Results />} />
+          <Route path="/quiz"      element={<Quiz />} />
+          <Route path="/results"   element={<Results />} />
           <Route path="/results/history" element={<ResultsHistory />} />
           <Route path="/analytics" element={<Analytics />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile"   element={<Profile />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
@@ -31,3 +35,4 @@ function App() {
 }
 
 export default App;
+

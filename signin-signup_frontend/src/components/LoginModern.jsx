@@ -183,11 +183,12 @@ function LoginModern() {
         .bb-logo-icon {
           width: 38px; height: 38px;
           border-radius: 10px;
-          background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+          overflow: hidden;
           display: flex; align-items: center; justify-content: center;
-          font-size: 20px;
-          box-shadow: 0 0 18px var(--glow-purple);
+          flex-shrink: 0;
+          box-shadow: 0 0 18px rgba(0,229,192,0.35);
         }
+        .bb-logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .bb-logo-text {
           font-family: 'Syne', sans-serif;
           font-weight: 800;
@@ -538,7 +539,7 @@ function LoginModern() {
         <div className="bb-card">
           {/* Logo */}
           <div className="bb-logo">
-            <div className="bb-logo-icon">🧠</div>
+            <div className="bb-logo-icon"><img src="/favicon-32.png" alt="Gyantra" /></div>
             <div className="bb-logo-text">
               Gyan<span>tra</span>
             </div>
@@ -688,6 +689,10 @@ function LoginModern() {
             </button>
           </div>
         </div>
+        <footer style={{textAlign:'center',padding:'1rem',fontSize:'11px',color:'rgba(255,255,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center',gap:'5px',background:'var(--bg-deep)',borderTop:'1px solid rgba(255,255,255,0.06)',width:'100%',position:'relative',zIndex:2}}>
+          <img src="/favicon-32.png" alt="" style={{width:14,height:14,borderRadius:3,verticalAlign:'middle'}} />
+          © {new Date().getFullYear()} Gyantra. All rights reserved.
+        </footer>
       </div>
     </>
   );

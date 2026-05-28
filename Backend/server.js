@@ -10,6 +10,12 @@ import userRoutes from "./src/routes/userRoutes.js";
 dotenv.config();
 
 const app = express();
+const allowedOrigins = [
+  "https://brainnbyte.netlify.app", // current live deployment
+  "https://gyantra.netlify.app", // future renamed deployment
+];
+const isLocalDevOrigin = (origin) =>
+  /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
 
 // logging middleware
 app.use((req, res, next) => {
@@ -26,13 +32,9 @@ app.use(
     origin: function (origin, callback) {
       // allow requests with no origin (mobile apps, curl, Postman)
       if (!origin) return callback(null, true);
-      const allowed = [
-        "https://brainnbyte.netlify.app",  // current live deployment
-        "https://gyantra.netlify.app",     // future renamed deployment
-        "http://localhost:5173",
-        "http://localhost:5174",
-      ];
-      if (allowed.includes(origin)) return callback(null, true);
+      if (allowedOrigins.includes(origin) || isLocalDevOrigin(origin)) {
+        return callback(null, true);
+      }
       callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

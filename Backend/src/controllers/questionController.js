@@ -5,8 +5,19 @@ import https from "https";
 const NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
 const NVIDIA_MODEL = "deepseek-ai/deepseek-v4-flash";
 
-// ─── Validate API key at first request (dotenv loads after imports) ───────────
+// ─── Validate API key at startup ─────────────────────────────────────────────
 let apiKeyWarned = false;
+// Log key status at module load so Render logs show it immediately
+setTimeout(() => {
+  const key = process.env.NVIDIA_API_KEY;
+  if (!key || key.trim() === "") {
+    console.error(
+      "❌ NVIDIA_API_KEY is NOT set — quiz generation will fail! Add it to Render environment variables.",
+    );
+  } else {
+    console.log(`NVIDIA_API_KEY loaded (starts with: ${key.slice(0, 12)}...)`);
+  }
+}, 1000);
 
 // ─── Keep-alive agents prevent TCP idle timeouts on slow AI responses ─────────
 const httpAgent = new http.Agent({ keepAlive: true, keepAliveMsecs: 30000 });
@@ -24,14 +35,12 @@ const getCacheKey = (subjects, difficulty, count) =>
 const buildPrompt = (subjects, difficulty, count) => {
   const subjectList = Array.isArray(subjects) ? subjects.join(", ") : subjects;
 
-  return `Generate ${count} MCQ questions as JSON. Subject: ${subjectList}. Difficulty: ${difficulty}.
+  return `
+Generate ${count} ${difficulty} MCQs on ${subjectList}.
 
-Return ONLY valid JSON, no markdown:
-{"quiz":[{"subject":"str","topic":"str","question":"str","options":["A text","B text","C text","D text"],"correctAnswer":"A","explanation":"str"}]}
-
-Rules: exactly ${count} items, 4 options each, correctAnswer is A/B/C/D, short explanation. Output JSON now:`;
+Return ONLY JSON:
+{"quiz":[{"question":"","options":["","","",""],"correctAnswer":"A"}]}`;
 };
-
 // ─── Aggressive JSON repair ────────────────────────────────────────────────────
 const repairJSON = (raw) => {
   let text = raw;
@@ -91,7 +100,7 @@ const callNvidia = async (prompt) => {
         model: NVIDIA_MODEL,
         messages: [{ role: "user", content: prompt }],
         temperature: 0.4,
-        max_tokens: 4000,
+        max_tokens: 1000,
         top_p: 0.7,
         stream: false,
       },
@@ -122,7 +131,9 @@ const callNvidia = async (prompt) => {
   } catch (err) {
     // Axios wraps errors — extract useful info
     if (err.code === "ECONNABORTED" || err.code === "ETIMEDOUT") {
-      throw new Error("NVIDIA API request timed out — the AI service is slow, please retry");
+      throw new Error(
+        "NVIDIA API request timed out — the AI service is slow, please retry",
+      );
     }
     if (err.response) {
       const status = err.response.status;
@@ -235,17 +246,21 @@ export const generateQuestions = async (req, res) => {
 
   try {
     // Guard: check API key
-    if (
-      !process.env.NVIDIA_API_KEY ||
-      process.env.NVIDIA_API_KEY.trim() === ""
-    ) {
+    const key = process.env.NVIDIA_API_KEY;
+    if (!key || key.trim() === "") {
       if (!apiKeyWarned) {
-        console.error("⚠️  NVIDIA_API_KEY is missing or empty in .env — quiz generation will fail!");
+        console.error(
+          "❌ NVIDIA_API_KEY is missing from environment variables.",
+        );
+        console.error(
+          "   → Go to Render dashboard → your service → Environment → add NVIDIA_API_KEY",
+        );
         apiKeyWarned = true;
       }
       return res.status(500).json({
         success: false,
-        message: "AI service is not configured — contact the administrator",
+        message:
+          "AI service is not configured — NVIDIA_API_KEY missing on server",
       });
     }
 
