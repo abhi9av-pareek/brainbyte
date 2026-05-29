@@ -3,69 +3,87 @@ import { useState, useEffect, useRef } from "react";
 import axios from "../utils/axiosConfig";
 import { Eye, EyeOff } from "lucide-react";
 
+/* ── Tiny particle canvas for the left panel ── */
+function PanelParticles() {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    let W, H, raf;
+    const particles = [];
+
+    const resize = () => {
+      W = canvas.width = canvas.parentElement.offsetWidth;
+      H = canvas.height = canvas.parentElement.offsetHeight;
+    };
+    resize();
+
+    for (let i = 0; i < 40; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 1.5 + 0.5,
+        a: Math.random() * 0.5 + 0.1,
+      });
+    }
+
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = W;
+        if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H;
+        if (p.y > H) p.y = 0;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,229,192,${p.a * 0.4})`;
+        ctx.fill();
+      });
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(0,229,192,${(1 - dist / 100) * 0.06})`;
+            ctx.stroke();
+          }
+        }
+      }
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    window.addEventListener("resize", resize);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "absolute",
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: "none",
+      }}
+    />
+  );
+}
+
 function LoginModern() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
-  const vantaRef = useRef(null);
-  const vantaEffect = useRef(null);
-
-  useEffect(() => {
-    // Load Three.js then Vanta Globe dynamically
-    const loadScript = (src) =>
-      new Promise((resolve, reject) => {
-        const existing = document.querySelector(`script[src="${src}"]`);
-        if (existing) {
-          resolve();
-          return;
-        }
-        const script = document.createElement("script");
-        script.src = src;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-
-    const initVanta = async () => {
-      try {
-        await loadScript(
-          "https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js",
-        );
-        await loadScript(
-          "https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js",
-        );
-
-        if (window.VANTA && vantaRef.current) {
-          vantaEffect.current = window.VANTA.GLOBE({
-            el: vantaRef.current,
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.0,
-            minWidth: 200.0,
-            scale: 1.0,
-            scaleMobile: 1.0,
-            color: 0x9b5de5, // purple — matches --accent-purple
-            color2: 0x00f5d4, // cyan — matches --accent-cyan
-            backgroundColor: 0x1a1030, // deep dark purple background
-            size: 1.2,
-            points: 10.0,
-            maxDistance: 22.0,
-            spacing: 18.0,
-          });
-        }
-      } catch (err) {
-        console.warn("Vanta.js failed to load:", err);
-      }
-    };
-
-    initVanta();
-
-    return () => {
-      if (vantaEffect.current) vantaEffect.current.destroy();
-    };
-  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -88,578 +106,699 @@ function LoginModern() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap');
 
-        :root {
-          --bg-deep:      #0d0a1a;
-          --bg-card:      rgba(26, 20, 50, 0.75);
-          --bg-input:     rgba(45, 27, 78, 0.45);
-          --accent-purple: #9b5de5;
-          --accent-cyan:   #00f5d4;
-          --accent-pink:   #f72585;
-          --border-glass:  rgba(155, 93, 229, 0.25);
-          --text-muted:    #8892a4;
-          --text-dim:      #5a6275;
-          --glow-purple:   rgba(155, 93, 229, 0.35);
-          --glow-cyan:     rgba(0, 245, 212, 0.25);
+        /* ── RESET FOR THIS PAGE ── */
+        .gl-root *,
+        .gl-root *::before,
+        .gl-root *::after {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
         }
 
-        .bb-login-root {
-          font-family: 'DM Sans', sans-serif;
+        /* ── ROOT LAYOUT ── */
+        .gl-root {
+          font-family: 'Exo 2', sans-serif;
           min-height: 100vh;
+          display: flex;
+          background: #030711;
+          overflow: hidden;
+        }
+
+        /* ══════════════════════════════════
+           LEFT PANEL — Illustration Side
+        ══════════════════════════════════ */
+        .gl-left {
+          flex: 1.15;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+          background:
+            radial-gradient(ellipse 80% 60% at 30% 50%, rgba(0,229,192,0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 50% at 80% 20%, rgba(124,92,252,0.06) 0%, transparent 60%),
+            linear-gradient(180deg, #030711 0%, #060D1A 100%);
+          padding: 3rem 2rem;
+        }
+
+        .gl-left-content {
+          position: relative;
+          z-index: 2;
+          text-align: center;
+          max-width: 400px;
+        }
+
+        /* Logo on left panel */
+        .gl-left-logo {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: var(--bg-deep);
+          gap: 10px;
+          margin-bottom: 3rem;
+          animation: glFadeUp 0.8s ease both;
+        }
+        .gl-left-logo-img {
+          width: 36px;
+          height: 36px;
+          border-radius: 9px;
           overflow: hidden;
-          position: relative;
-          padding: 1.5rem;
         }
-
-        /* ── Vanta canvas wrapper ── */
-        .bb-vanta-bg {
-          position: fixed;
-          inset: 0;
-          z-index: 0;
-        }
-
-        /* subtle overlay so text stays readable */
-        .bb-vanta-overlay {
-          position: fixed;
-          inset: 0;
-          z-index: 1;
-          background: radial-gradient(ellipse at 60% 50%,
-            rgba(13,10,26,0.55) 0%,
-            rgba(13,10,26,0.82) 70%,
-            rgba(13,10,26,0.95) 100%);
-          pointer-events: none;
-        }
-
-        /* ── Card ── */
-        .bb-card {
-          position: relative;
-          z-index: 10;
+        .gl-left-logo-img img {
           width: 100%;
-          max-width: 460px;
-          background: var(--bg-card);
-          border: 1px solid var(--border-glass);
-          border-radius: 24px;
-          padding: 2.75rem 2.5rem 2.5rem;
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          box-shadow:
-            0 0 0 1px rgba(155,93,229,0.1),
-            0 32px 80px rgba(0,0,0,0.6),
-            0 0 60px rgba(155,93,229,0.1) inset;
-          animation: cardReveal 0.7s cubic-bezier(.22,1,.36,1) both;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .gl-left-logo-text {
+          font-family: 'Orbitron', monospace;
+          font-weight: 700;
+          font-size: 20px;
+          color: #E8F4F0;
+          letter-spacing: 2px;
+        }
+        .gl-left-logo-text span {
+          color: #00E5C0;
         }
 
-        @keyframes cardReveal {
-          from { opacity: 0; transform: translateY(28px) scale(0.97); }
+        /* Floating geometric shapes */
+        .gl-shapes {
+          position: relative;
+          width: 320px;
+          height: 320px;
+          margin: 0 auto 2.5rem;
+          animation: glFadeUp 0.8s 0.15s ease both;
+        }
+
+        .gl-shape {
+          position: absolute;
+          border-radius: 50%;
+          animation: glFloat 6s ease-in-out infinite;
+        }
+
+        /* Large cyan circle */
+        .gl-shape-1 {
+          width: 140px;
+          height: 140px;
+          background: linear-gradient(135deg, #00E5C0 0%, #00B896 100%);
+          top: 30%;
+          left: 10%;
+          opacity: 0.9;
+          animation-delay: 0s;
+          border-radius: 32px;
+          box-shadow: 0 20px 60px rgba(0,229,192,0.25);
+        }
+
+        /* Purple rounded rectangle */
+        .gl-shape-2 {
+          width: 100px;
+          height: 130px;
+          background: linear-gradient(135deg, #7C5CFC 0%, #5A3FD9 100%);
+          top: 15%;
+          right: 15%;
+          border-radius: 24px;
+          animation-delay: -2s;
+          box-shadow: 0 16px 50px rgba(124,92,252,0.2);
+        }
+
+        /* Warm accent pill */
+        .gl-shape-3 {
+          width: 70px;
+          height: 90px;
+          background: linear-gradient(135deg, #FFB347 0%, #FF6B35 100%);
+          bottom: 15%;
+          right: 25%;
+          border-radius: 35px;
+          animation-delay: -4s;
+          box-shadow: 0 12px 40px rgba(255,107,53,0.2);
+        }
+
+        /* Small dark circle (like a face) */
+        .gl-shape-4 {
+          width: 60px;
+          height: 60px;
+          background: #1A2540;
+          border: 2px solid rgba(0,229,192,0.3);
+          bottom: 25%;
+          left: 20%;
+          border-radius: 50%;
+          animation-delay: -1s;
+        }
+        .gl-shape-4::before,
+        .gl-shape-4::after {
+          content: '';
+          position: absolute;
+          width: 8px;
+          height: 8px;
+          background: #00E5C0;
+          border-radius: 50%;
+          top: 40%;
+        }
+        .gl-shape-4::before { left: 30%; }
+        .gl-shape-4::after { right: 30%; }
+
+        /* Tiny floating dots */
+        .gl-dot {
+          position: absolute;
+          border-radius: 50%;
+          animation: glFloat 5s ease-in-out infinite;
+        }
+        .gl-dot-1 { width: 12px; height: 12px; background: #00E5C0; top: 8%; left: 35%; animation-delay: -3s; opacity: 0.5; }
+        .gl-dot-2 { width: 8px; height: 8px; background: #7C5CFC; bottom: 8%; left: 45%; animation-delay: -1.5s; opacity: 0.4; }
+        .gl-dot-3 { width: 10px; height: 10px; background: #FFB347; top: 55%; right: 8%; animation-delay: -4.5s; opacity: 0.6; }
+        .gl-dot-4 { width: 6px; height: 6px; background: #00E5C0; top: 75%; left: 8%; animation-delay: -2.5s; opacity: 0.3; }
+
+        /* Phone mockup shape */
+        .gl-phone {
+          position: absolute;
+          width: 55px;
+          height: 95px;
+          background: #1A2540;
+          border: 2px solid rgba(0,229,192,0.2);
+          border-radius: 12px;
+          top: 8%;
+          left: 55%;
+          animation: glFloat 7s ease-in-out infinite;
+          animation-delay: -3s;
+        }
+        .gl-phone::before {
+          content: '';
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          right: 8px;
+          bottom: 8px;
+          border-radius: 6px;
+          background: linear-gradient(180deg, rgba(0,229,192,0.15) 0%, rgba(124,92,252,0.1) 100%);
+        }
+
+        .gl-left-tagline {
+          font-family: 'Orbitron', monospace;
+          font-size: 1.15rem;
+          font-weight: 700;
+          color: #E8F4F0;
+          letter-spacing: 1px;
+          margin-bottom: 0.6rem;
+          animation: glFadeUp 0.8s 0.3s ease both;
+        }
+        .gl-left-tagline span {
+          color: #00E5C0;
+        }
+        .gl-left-sub {
+          font-size: 0.88rem;
+          color: #8BA8A0;
+          line-height: 1.7;
+          font-weight: 300;
+          animation: glFadeUp 0.8s 0.4s ease both;
+        }
+
+        /* ══════════════════════════════════
+           RIGHT PANEL — Form Side
+        ══════════════════════════════════ */
+        .gl-right {
+          flex: 0.85;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 3rem 2.5rem;
+          position: relative;
+          background:
+            linear-gradient(180deg, #0A1628 0%, #0E1F38 50%, #0A1628 100%);
+          border-left: 1px solid rgba(0,229,192,0.1);
+        }
+
+        .gl-form-wrap {
+          width: 100%;
+          max-width: 380px;
+          animation: glCardReveal 0.7s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        @keyframes glCardReveal {
+          from { opacity: 0; transform: translateY(24px) scale(0.98); }
           to   { opacity: 1; transform: translateY(0)   scale(1); }
         }
 
-        /* top glow bar */
-        .bb-card::before {
-          content: '';
-          position: absolute;
-          top: -1px; left: 10%; right: 10%;
-          height: 2px;
-          background: linear-gradient(90deg,
-            transparent,
-            var(--accent-purple),
-            var(--accent-cyan),
-            transparent);
-          border-radius: 999px;
-        }
-
-        /* ── Logo row ── */
-        .bb-logo {
+        /* Star / Logo icon */
+        .gl-form-icon {
+          width: 48px;
+          height: 48px;
+          margin: 0 auto 1.75rem;
           display: flex;
           align-items: center;
-          gap: 10px;
-          margin-bottom: 2rem;
-        }
-        .bb-logo-icon {
-          width: 38px; height: 38px;
-          border-radius: 10px;
-          overflow: hidden;
-          display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
-          box-shadow: 0 0 18px rgba(0,229,192,0.35);
-        }
-        .bb-logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .bb-logo-text {
-          font-family: 'Syne', sans-serif;
-          font-weight: 800;
-          font-size: 1.3rem;
-          color: #fff;
-          letter-spacing: -0.3px;
-        }
-        .bb-logo-text span {
-          background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        /* ── Heading ── */
-        .bb-heading {
-          font-family: 'Syne', sans-serif;
-          font-size: 2.1rem;
-          font-weight: 800;
-          line-height: 1.1;
-          color: #fff;
-          margin-bottom: 0.4rem;
-          animation: fadeUp 0.6s 0.15s both;
-        }
-        .bb-heading span {
-          background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        .bb-subheading {
-          color: var(--text-muted);
-          font-size: 0.9rem;
-          margin-bottom: 2rem;
-          animation: fadeUp 0.6s 0.22s both;
-        }
-
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(12px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ── Input group ── */
-        .bb-field {
-          position: relative;
-          margin-bottom: 1rem;
-          animation: fadeUp 0.6s 0.3s both;
-        }
-        .bb-field + .bb-field { animation-delay: 0.37s; }
-
-        .bb-input {
-          width: 100%;
-          box-sizing: border-box;
-          background: var(--bg-input);
-          border: 1px solid var(--border-glass);
+          justify-content: center;
+          background: linear-gradient(135deg, rgba(0,229,192,0.15) 0%, rgba(124,92,252,0.1) 100%);
+          border: 1px solid rgba(0,229,192,0.2);
           border-radius: 14px;
-          padding: 0.95rem 3rem 0.95rem 1.1rem;
-          color: #fff;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 0.93rem;
-          transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
-          outline: none;
+          animation: glFadeUp 0.6s 0.1s ease both;
         }
-        .bb-input::placeholder { color: var(--text-dim); }
-        .bb-input:focus {
-          border-color: var(--accent-purple);
-          background: rgba(155, 93, 229, 0.08);
-          box-shadow: 0 0 0 3px rgba(155,93,229,0.18), 0 0 20px rgba(155,93,229,0.12);
-        }
-        .bb-input:hover:not(:focus) {
-          border-color: rgba(155, 93, 229, 0.45);
+        .gl-form-icon img {
+          width: 28px;
+          height: 28px;
+          border-radius: 6px;
         }
 
-        .bb-input-icon {
-          position: absolute;
-          right: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: rgba(155,93,229,0.55);
-          pointer-events: none;
-          display: flex;
+        /* Heading */
+        .gl-heading {
+          font-family: 'Orbitron', monospace;
+          font-size: 1.85rem;
+          font-weight: 900;
+          color: #E8F4F0;
+          text-align: center;
+          margin-bottom: 0.4rem;
+          letter-spacing: -0.5px;
+          animation: glFadeUp 0.6s 0.15s ease both;
         }
-        .bb-eye-btn {
+        .gl-heading span {
+          color: #00E5C0;
+        }
+
+        .gl-subheading {
+          text-align: center;
+          font-size: 0.85rem;
+          color: #8BA8A0;
+          margin-bottom: 2.25rem;
+          font-weight: 300;
+          animation: glFadeUp 0.6s 0.2s ease both;
+        }
+
+        /* ── Underline-style inputs ── */
+        .gl-field {
+          position: relative;
+          margin-bottom: 1.5rem;
+          animation: glFadeUp 0.6s 0.28s ease both;
+        }
+        .gl-field + .gl-field {
+          animation-delay: 0.34s;
+        }
+
+        .gl-label {
+          display: block;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #8BA8A0;
+          letter-spacing: 0.5px;
+          margin-bottom: 0.45rem;
+        }
+
+        .gl-input {
+          width: 100%;
+          background: transparent;
+          border: none;
+          border-bottom: 1.5px solid rgba(0,229,192,0.2);
+          padding: 0.65rem 2.5rem 0.65rem 0;
+          color: #E8F4F0;
+          font-family: 'Exo 2', sans-serif;
+          font-size: 0.9rem;
+          font-weight: 400;
+          outline: none;
+          transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .gl-input::placeholder {
+          color: #4A7A72;
+          font-weight: 300;
+        }
+        .gl-input:focus {
+          border-color: #00E5C0;
+          box-shadow: 0 2px 12px rgba(0,229,192,0.15);
+        }
+        .gl-input:hover:not(:focus) {
+          border-color: rgba(0,229,192,0.4);
+        }
+
+        .gl-eye-btn {
           position: absolute;
-          right: 14px;
-          top: 50%;
-          transform: translateY(-50%);
+          right: 0;
+          bottom: 10px;
           background: none;
           border: none;
           cursor: pointer;
-          color: var(--text-muted);
+          color: #8BA8A0;
           display: flex;
           padding: 0;
           transition: color 0.2s;
         }
-        .bb-eye-btn:hover { color: var(--accent-purple); }
+        .gl-eye-btn:hover {
+          color: #00E5C0;
+        }
 
         /* ── Options row ── */
-        .bb-options {
+        .gl-options {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 1.6rem;
-          font-size: 0.83rem;
-          animation: fadeUp 0.6s 0.44s both;
+          margin-bottom: 1.75rem;
+          font-size: 0.78rem;
+          animation: glFadeUp 0.6s 0.4s ease both;
         }
-        .bb-remember {
-          display: flex; align-items: center; gap: 8px;
-          cursor: pointer; color: var(--text-muted);
+        .gl-remember {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          color: #8BA8A0;
         }
-        .bb-remember input[type="checkbox"] {
-          accent-color: var(--accent-purple);
-          width: 15px; height: 15px;
-          border-radius: 4px;
+        .gl-remember input[type="checkbox"] {
+          accent-color: #00E5C0;
+          width: 14px;
+          height: 14px;
+          border-radius: 3px;
+          cursor: pointer;
         }
-        .bb-forgot {
-          color: var(--accent-purple);
+        .gl-forgot {
+          color: #00E5C0;
           text-decoration: none;
-          transition: color 0.2s;
+          font-weight: 500;
+          transition: color 0.2s, opacity 0.2s;
         }
-        .bb-forgot:hover { color: var(--accent-cyan); }
+        .gl-forgot:hover {
+          opacity: 0.75;
+        }
 
         /* ── CTA button ── */
-        .bb-btn-login {
+        .gl-btn-login {
           width: 100%;
-          padding: 1rem;
+          padding: 0.9rem 1rem;
           border: none;
-          border-radius: 14px;
-          background: linear-gradient(135deg, var(--accent-purple) 0%, #5e0ace 50%, var(--accent-cyan) 120%);
-          background-size: 200% 200%;
-          color: #fff;
-          font-family: 'Syne', sans-serif;
+          border-radius: 10px;
+          background: #00E5C0;
+          color: #030711;
+          font-family: 'Exo 2', sans-serif;
           font-weight: 700;
-          font-size: 1rem;
-          letter-spacing: 0.3px;
+          font-size: 0.9rem;
+          letter-spacing: 1px;
+          text-transform: uppercase;
           cursor: pointer;
-          transition: transform 0.18s, box-shadow 0.25s, background-position 0.4s;
-          box-shadow: 0 6px 30px rgba(155,93,229,0.45);
-          display: flex; align-items: center; justify-content: center; gap: 8px;
-          animation: fadeUp 0.6s 0.5s both;
+          transition: transform 0.18s, box-shadow 0.3s, background 0.3s;
+          box-shadow: 0 4px 24px rgba(0,229,192,0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          animation: glFadeUp 0.6s 0.46s ease both;
         }
-        .bb-btn-login:hover:not(:disabled) {
-          transform: translateY(-2px) scale(1.01);
-          box-shadow: 0 12px 40px rgba(155,93,229,0.6), 0 0 40px rgba(0,245,212,0.18);
-          background-position: right center;
+        .gl-btn-login:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 36px rgba(0,229,192,0.5);
+          background: #00D4B3;
         }
-        .bb-btn-login:active:not(:disabled) {
+        .gl-btn-login:active:not(:disabled) {
           transform: scale(0.975);
         }
-        .bb-btn-login:disabled {
-          opacity: 0.55; cursor: not-allowed;
+        .gl-btn-login:disabled {
+          opacity: 0.55;
+          cursor: not-allowed;
         }
 
-        .bb-spinner {
-          width: 16px; height: 16px;
-          border: 2px solid rgba(255,255,255,0.25);
-          border-top-color: #fff;
+        .gl-spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(3,7,17,0.3);
+          border-top-color: #030711;
           border-radius: 50%;
-          animation: spin 0.7s linear infinite;
+          animation: glSpin 0.7s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes glSpin { to { transform: rotate(360deg); } }
+
+        /* ── Google button ── */
+        .gl-btn-google {
+          width: 100%;
+          padding: 0.8rem 1rem;
+          border: 1px solid rgba(0,229,192,0.2);
+          border-radius: 10px;
+          background: transparent;
+          color: #E8F4F0;
+          font-family: 'Exo 2', sans-serif;
+          font-weight: 500;
+          font-size: 0.85rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          margin-top: 0.75rem;
+          transition: border-color 0.2s, background 0.2s, transform 0.2s;
+          animation: glFadeUp 0.6s 0.52s ease both;
+        }
+        .gl-btn-google:hover {
+          border-color: rgba(0,229,192,0.45);
+          background: rgba(0,229,192,0.05);
+          transform: translateY(-1px);
+        }
+        .gl-btn-google svg {
+          width: 18px;
+          height: 18px;
+          flex-shrink: 0;
+        }
 
         /* ── Sign-up nudge ── */
-        .bb-signup-nudge {
+        .gl-signup-nudge {
           text-align: center;
-          font-size: 0.85rem;
-          color: var(--text-muted);
-          margin-top: 1.4rem;
-          animation: fadeUp 0.6s 0.56s both;
+          font-size: 0.82rem;
+          color: #8BA8A0;
+          margin-top: 2rem;
+          animation: glFadeUp 0.6s 0.58s ease both;
         }
-        .bb-signup-nudge a {
-          background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          font-weight: 600;
+        .gl-signup-nudge a {
+          color: #00E5C0;
           text-decoration: none;
+          font-weight: 600;
           transition: opacity 0.2s;
         }
-        .bb-signup-nudge a:hover { opacity: 0.8; }
-
-        /* ── Divider ── */
-        .bb-divider {
-          display: flex; align-items: center; gap: 14px;
-          margin: 1.5rem 0 1.1rem;
-          animation: fadeUp 0.6s 0.62s both;
-        }
-        .bb-divider-line {
-          flex: 1; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(155,93,229,0.35), transparent);
-        }
-        .bb-divider span {
-          color: var(--text-dim); font-size: 0.77rem; white-space: nowrap;
+        .gl-signup-nudge a:hover {
+          opacity: 0.75;
         }
 
-        /* ── Social buttons ── */
-        .bb-socials {
-          display: flex; gap: 12px;
-          animation: fadeUp 0.6s 0.68s both;
-        }
-        .bb-social-btn {
-          flex: 1;
-          border: 1px solid var(--border-glass);
-          border-radius: 12px;
-          padding: 0.7rem;
-          background: rgba(255,255,255,0.03);
-          cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          gap: 8px;
-          color: var(--text-muted);
-          font-size: 0.8rem;
-          font-family: 'DM Sans', sans-serif;
-          transition: border-color 0.2s, background 0.2s, color 0.2s;
-        }
-        .bb-social-btn:hover {
-          border-color: rgba(155,93,229,0.5);
-          background: rgba(155,93,229,0.07);
-          color: #fff;
-        }
-        .bb-social-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
-
-        /* ── Floating particles (pure CSS) ── */
-        .bb-particles {
-          position: fixed; inset: 0; pointer-events: none; z-index: 2;
-          overflow: hidden;
-        }
-        .bb-particle {
+        /* ── Footer ── */
+        .gl-footer {
           position: absolute;
-          border-radius: 50%;
-          animation: floatUp linear infinite;
-          opacity: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          text-align: center;
+          padding: 1rem;
+          font-size: 11px;
+          color: rgba(139,168,160,0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
         }
-        @keyframes floatUp {
-          0%   { transform: translateY(0)   scale(1);   opacity: 0; }
-          10%  { opacity: 0.6; }
-          90%  { opacity: 0.3; }
-          100% { transform: translateY(-110vh) scale(0.4); opacity: 0; }
+        .gl-footer img {
+          width: 13px;
+          height: 13px;
+          border-radius: 3px;
+          opacity: 0.5;
+        }
+
+        /* ── Animations ── */
+        @keyframes glFadeUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glFloat {
+          0%, 100% { transform: translateY(0px); }
+          50%      { transform: translateY(-14px); }
+        }
+
+        /* ══════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════ */
+        @media (max-width: 900px) {
+          .gl-root {
+            flex-direction: column;
+          }
+          .gl-left {
+            flex: none;
+            padding: 2rem 1.5rem 1.5rem;
+            min-height: auto;
+          }
+          .gl-shapes {
+            width: 220px;
+            height: 220px;
+            margin-bottom: 1.5rem;
+          }
+          .gl-shape-1 { width: 95px; height: 95px; border-radius: 22px; }
+          .gl-shape-2 { width: 70px; height: 90px; border-radius: 18px; }
+          .gl-shape-3 { width: 50px; height: 65px; border-radius: 25px; }
+          .gl-shape-4 { width: 45px; height: 45px; }
+          .gl-phone { width: 40px; height: 70px; border-radius: 9px; }
+          .gl-left-tagline { font-size: 1rem; }
+          .gl-left-sub { font-size: 0.82rem; }
+
+          .gl-right {
+            flex: 1;
+            border-left: none;
+            border-top: 1px solid rgba(0,229,192,0.1);
+            padding: 2rem 1.5rem 4rem;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .gl-left {
+            padding: 1.5rem 1rem 1rem;
+          }
+          .gl-shapes {
+            width: 180px;
+            height: 180px;
+            margin-bottom: 1rem;
+          }
+          .gl-shape-1 { width: 80px; height: 80px; border-radius: 18px; }
+          .gl-shape-2 { width: 55px; height: 75px; border-radius: 14px; }
+          .gl-shape-3 { width: 40px; height: 55px; }
+          .gl-shape-4 { width: 38px; height: 38px; }
+          .gl-phone { width: 32px; height: 56px; }
+          .gl-dot-1, .gl-dot-2, .gl-dot-3, .gl-dot-4 { display: none; }
+          .gl-left-tagline { font-size: 0.9rem; }
+          .gl-left-sub { font-size: 0.78rem; }
+          .gl-left-logo-text { font-size: 17px; }
+
+          .gl-right {
+            padding: 1.5rem 1.25rem 4rem;
+          }
+          .gl-heading {
+            font-size: 1.5rem;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .gl-shapes {
+            width: 150px;
+            height: 150px;
+          }
+          .gl-shape-1 { width: 65px; height: 65px; }
+          .gl-shape-2 { width: 45px; height: 60px; }
+          .gl-shape-3 { width: 35px; height: 45px; }
+          .gl-shape-4 { width: 32px; height: 32px; }
+          .gl-phone { display: none; }
+          .gl-heading { font-size: 1.35rem; }
+          .gl-left-logo-text { display: none; }
         }
       `}</style>
 
-      {/* Vanta canvas */}
-      <div className="bb-vanta-bg" ref={vantaRef} />
-      <div className="bb-vanta-overlay" />
+      <div className="gl-root">
+        {/* ════ LEFT PANEL ════ */}
+        <div className="gl-left">
+          <PanelParticles />
 
-      {/* Floating CSS particles */}
-      <div className="bb-particles" aria-hidden="true">
-        {[
-          {
-            left: "8%",
-            bottom: "5%",
-            size: 5,
-            dur: "18s",
-            delay: "0s",
-            color: "#9b5de5",
-          },
-          {
-            left: "20%",
-            bottom: "10%",
-            size: 3,
-            dur: "24s",
-            delay: "4s",
-            color: "#00f5d4",
-          },
-          {
-            left: "35%",
-            bottom: "2%",
-            size: 6,
-            dur: "20s",
-            delay: "1.5s",
-            color: "#9b5de5",
-          },
-          {
-            left: "52%",
-            bottom: "8%",
-            size: 4,
-            dur: "16s",
-            delay: "6s",
-            color: "#00f5d4",
-          },
-          {
-            left: "68%",
-            bottom: "3%",
-            size: 3,
-            dur: "22s",
-            delay: "2s",
-            color: "#f72585",
-          },
-          {
-            left: "80%",
-            bottom: "12%",
-            size: 5,
-            dur: "19s",
-            delay: "8s",
-            color: "#9b5de5",
-          },
-          {
-            left: "92%",
-            bottom: "6%",
-            size: 4,
-            dur: "25s",
-            delay: "3s",
-            color: "#00f5d4",
-          },
-          {
-            left: "14%",
-            bottom: "0%",
-            size: 3,
-            dur: "21s",
-            delay: "10s",
-            color: "#f72585",
-          },
-          {
-            left: "45%",
-            bottom: "15%",
-            size: 6,
-            dur: "17s",
-            delay: "5s",
-            color: "#9b5de5",
-          },
-          {
-            left: "75%",
-            bottom: "0%",
-            size: 4,
-            dur: "23s",
-            delay: "7s",
-            color: "#00f5d4",
-          },
-        ].map((p, i) => (
-          <div
-            key={i}
-            className="bb-particle"
-            style={{
-              left: p.left,
-              bottom: p.bottom,
-              width: p.size,
-              height: p.size,
-              background: p.color,
-              boxShadow: `0 0 ${p.size * 3}px ${p.color}`,
-              animationDuration: p.dur,
-              animationDelay: p.delay,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Login card */}
-      <div className="bb-login-root">
-        <div className="bb-card">
-          {/* Logo */}
-          <div className="bb-logo">
-            <div className="bb-logo-icon"><img src="/favicon-32.png" alt="Gyantra" /></div>
-            <div className="bb-logo-text">
-              Gyan<span>tra</span>
+          <div className="gl-left-content">
+            {/* Logo */}
+            <div className="gl-left-logo">
+              <div className="gl-left-logo-img">
+                <img src="/favicon-32.png" alt="Gyantra" />
+              </div>
+              <span className="gl-left-logo-text">
+                GY<span>AN</span>TRA
+              </span>
             </div>
+
+            {/* Geometric illustration shapes */}
+            <div className="gl-shapes">
+              <div className="gl-shape gl-shape-1" />
+              <div className="gl-shape gl-shape-2" />
+              <div className="gl-shape gl-shape-3" />
+              <div className="gl-shape gl-shape-4" />
+              <div className="gl-phone" />
+              <div className="gl-dot gl-dot-1" />
+              <div className="gl-dot gl-dot-2" />
+              <div className="gl-dot gl-dot-3" />
+              <div className="gl-dot gl-dot-4" />
+            </div>
+
+            <h2 className="gl-left-tagline">
+              Master Every <span>Exam with AI</span>
+            </h2>
+            <p className="gl-left-sub">
+              AI-powered quiz platform with adaptive learning,
+              deep analytics, and streak-based motivation.
+            </p>
           </div>
+        </div>
 
-          {/* Heading */}
-          <h1 className="bb-heading">
-            Welcome <span>Back!</span>
-          </h1>
-          <p className="bb-subheading">Login and compete with minds.</p>
+        {/* ════ RIGHT PANEL — Login Form ════ */}
+        <div className="gl-right">
+          <div className="gl-form-wrap">
+            {/* Icon */}
+            <div className="gl-form-icon">
+              <img src="/favicon-32.png" alt="" />
+            </div>
 
-          {/* Email */}
-          <div className="bb-field">
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              className="bb-input"
-              autoComplete="email"
-            />
-            <span className="bb-input-icon">
-              <svg
-                width="18"
-                height="18"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {/* Heading */}
+            <h1 className="gl-heading">
+              Welcome <span>Back!</span>
+            </h1>
+            <p className="gl-subheading">Please enter your details</p>
+
+            {/* Email */}
+            <div className="gl-field">
+              <label className="gl-label">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="you@example.com"
+                className="gl-input"
+                autoComplete="email"
+                id="login-email"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="gl-field">
+              <label className="gl-label">Password</label>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                className="gl-input"
+                autoComplete="current-password"
+                id="login-password"
+              />
+              <button
+                type="button"
+                className="gl-eye-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label="Toggle password visibility"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-            </span>
-          </div>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
 
-          {/* Password */}
-          <div className="bb-field">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              className="bb-input"
-              autoComplete="current-password"
-            />
+            {/* Remember / Forgot */}
+            <div className="gl-options">
+              <label className="gl-remember">
+                <input type="checkbox" />
+                <span>Remember for 30 days</span>
+              </label>
+              <Link to="#" className="gl-forgot">
+                Forgot password?
+              </Link>
+            </div>
+
+            {/* Login button */}
             <button
-              type="button"
-              className="bb-eye-btn"
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label="Toggle password visibility"
+              className="gl-btn-login"
+              onClick={handleLogin}
+              disabled={isLoading}
+              id="login-submit"
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {isLoading ? (
+                <>
+                  <div className="gl-spinner" />
+                  Logging in...
+                </>
+              ) : (
+                "Log In"
+              )}
             </button>
-          </div>
 
-          {/* Remember / Forgot */}
-          <div className="bb-options">
-            <label className="bb-remember">
-              <input type="checkbox" />
-              <span>Remember me</span>
-            </label>
-            <Link to="#" className="bb-forgot">
-              Forgot Password?
-            </Link>
-          </div>
-
-          {/* Login button */}
-          <button
-            className="bb-btn-login"
-            onClick={handleLogin}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <div className="bb-spinner" />
-                Logging in...
-              </>
-            ) : (
-              <>
-                <svg
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2.2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-                Log In
-              </>
-            )}
-          </button>
-
-          {/* Sign up nudge */}
-          <p className="bb-signup-nudge">
-            New here? <Link to="/signup">Create an Account</Link>
-          </p>
-
-          {/* Divider */}
-          <div className="bb-divider">
-            <div className="bb-divider-line" />
-            <span>or continue with</span>
-            <div className="bb-divider-line" />
-          </div>
-
-          {/* Social */}
-          <div className="bb-socials">
-            <button className="bb-social-btn" aria-label="Continue with Google">
-              {/* Google icon */}
+            {/* Google login */}
+            <button className="gl-btn-google" id="login-google">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -678,21 +817,22 @@ function LoginModern() {
                   fill="#EA4335"
                 />
               </svg>
-              Google
+              Log in with Google
             </button>
-            <button className="bb-social-btn" aria-label="Continue with GitHub">
-              {/* GitHub icon */}
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
-              </svg>
-              GitHub
-            </button>
+
+            {/* Sign up nudge */}
+            <p className="gl-signup-nudge">
+              Don't have an account?{" "}
+              <Link to="/signup">Sign Up</Link>
+            </p>
+          </div>
+
+          {/* Footer */}
+          <div className="gl-footer">
+            <img src="/favicon-32.png" alt="" />
+            © {new Date().getFullYear()} Gyantra. All rights reserved.
           </div>
         </div>
-        <footer style={{textAlign:'center',padding:'1rem',fontSize:'11px',color:'rgba(255,255,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center',gap:'5px',background:'var(--bg-deep)',borderTop:'1px solid rgba(255,255,255,0.06)',width:'100%',position:'relative',zIndex:2}}>
-          <img src="/favicon-32.png" alt="" style={{width:14,height:14,borderRadius:3,verticalAlign:'middle'}} />
-          © {new Date().getFullYear()} Gyantra. All rights reserved.
-        </footer>
       </div>
     </>
   );
