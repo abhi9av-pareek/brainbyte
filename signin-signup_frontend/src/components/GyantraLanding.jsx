@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { Zap, Target, BarChart3, Bookmark, Trophy, Lightbulb, Clock, Check, Sparkles } from "lucide-react";
 
 /* ─── Animated counter ─── */
 function Counter({ to, suffix = "", duration = 2000 }) {
@@ -199,12 +200,12 @@ export default function GyantraLanding() {
   const scrollTo = (id) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setMobileMenu(false); };
 
   const FEATURES = [
-    { icon: "⚡", title: "AI Question Generation", desc: "Powered by NVIDIA AI — generates exam-grade MCQs on any subject, topic, or difficulty level." },
-    { icon: "🎯", title: "Adaptive Difficulty", desc: "Easy → Medium → Hard progression based on your actual performance. Weak topics get more focus." },
-    { icon: "📊", title: "Deep Analytics", desc: "Subject-wise accuracy, score trends, activity heatmaps, difficulty breakdown — all visualised beautifully." },
-    { icon: "🔖", title: "Smart Bookmarks", desc: "Bookmark any question during a quiz. Add your own notes. Review before exams." },
-    { icon: "🏆", title: "XP & Leaderboard", desc: "Earn XP for every quiz. Streak bonuses for daily activity. Compete on a global leaderboard." },
-    { icon: "💡", title: "Weak Topic Radar", desc: "Topics below 60% accuracy are flagged with specific revision tips and suggested question counts." },
+    { icon: <Zap size={22} />, title: "AI Question Generation", desc: "Powered by NVIDIA AI — generates exam-grade MCQs on any subject, topic, or difficulty level." },
+    { icon: <Target size={22} />, title: "Adaptive Difficulty", desc: "Easy → Medium → Hard progression based on your actual performance. Weak topics get more focus." },
+    { icon: <BarChart3 size={22} />, title: "Deep Analytics", desc: "Subject-wise accuracy, score trends, activity heatmaps, difficulty breakdown — all visualised beautifully." },
+    { icon: <Bookmark size={22} />, title: "Smart Bookmarks", desc: "Bookmark any question during a quiz. Add your own notes. Review before exams." },
+    { icon: <Trophy size={22} />, title: "XP & Leaderboard", desc: "Earn XP for every quiz. Streak bonuses for daily activity. Compete on a global leaderboard." },
+    { icon: <Lightbulb size={22} />, title: "Weak Topic Radar", desc: "Topics below 60% accuracy are flagged with specific revision tips and suggested question counts." },
   ];
 
   const HOW_STEPS = [
@@ -226,7 +227,7 @@ export default function GyantraLanding() {
           <div key={i} className={`qpc-opt${i === 0 ? " correct" : ""}`}>{o}</div>
         ))}
       </div>
-      <div className="qpc-tag">✓ AI Generated</div>
+      <div className="qpc-tag" style={{ display: "flex", alignItems: "center", gap: 4 }}><Sparkles size={12} /> AI Generated</div>
     </div>,
     <div className="quiz-preview-card" key="b" style={{ background: "linear-gradient(135deg, #0A1628 0%, #0E2040 100%)" }}>
       <div className="qpc-subject">Mathematics · Medium</div>
@@ -236,7 +237,7 @@ export default function GyantraLanding() {
           <div key={i} className={`qpc-opt${i === 1 ? " correct" : ""}`}>{o}</div>
         ))}
       </div>
-      <div className="qpc-tag">✓ AI Generated</div>
+      <div className="qpc-tag" style={{ display: "flex", alignItems: "center", gap: 4 }}><Sparkles size={12} /> AI Generated</div>
     </div>,
     <div className="quiz-preview-card" key="c" style={{ background: "linear-gradient(135deg, #0A1628 0%, #150E2A 100%)" }}>
       <div className="qpc-subject">Computer Science · Easy</div>
@@ -246,7 +247,7 @@ export default function GyantraLanding() {
           <div key={i} className={`qpc-opt${i === 1 ? " correct" : ""}`}>{o}</div>
         ))}
       </div>
-      <div className="qpc-tag">✓ AI Generated</div>
+      <div className="qpc-tag" style={{ display: "flex", alignItems: "center", gap: 4 }}><Sparkles size={12} /> AI Generated</div>
     </div>,
     <div className="quiz-preview-card" key="d" style={{ background: "linear-gradient(135deg, #0A1628 0%, #0E1F28 100%)" }}>
       <div className="qpc-subject">Chemistry · Hard</div>
@@ -256,34 +257,34 @@ export default function GyantraLanding() {
           <div key={i} className={`qpc-opt${i === 2 ? " correct" : ""}`}>{o}</div>
         ))}
       </div>
-      <div className="qpc-tag">✓ AI Generated</div>
+      <div className="qpc-tag" style={{ display: "flex", alignItems: "center", gap: 4 }}><Sparkles size={12} /> AI Generated</div>
     </div>,
   ];
 
   /* Flip cards for features section */
   const FLIP_DATA = [
     {
-      front: { icon: "⚡", title: "AI Questions", stat: "∞ unique MCQs" },
+      front: { icon: <Zap size={28} />, title: "AI Questions", stat: "∞ unique MCQs" },
       back: { title: "How it works", text: "NVIDIA DeepSeek AI generates contextual, exam-grade questions from your chosen subject, difficulty & topic — no repetition, no limits." },
     },
     {
-      front: { icon: "📊", title: "Deep Analytics", stat: "15+ metrics tracked" },
+      front: { icon: <BarChart3 size={28} />, title: "Deep Analytics", stat: "15+ metrics tracked" },
       back: { title: "What you get", text: "Score trends, accuracy by subject, activity heatmaps, streak calendars, weak-topic radar, and global rank — all from your quiz history." },
     },
     {
-      front: { icon: "🏆", title: "XP & Rank", stat: "Real-time leaderboard" },
+      front: { icon: <Trophy size={28} />, title: "XP & Rank", stat: "Real-time leaderboard" },
       back: { title: "Earn & Compete", text: "Score 90%+ → 100 XP. Streak bonuses → +20 XP/day. Level up from Newcomer → Legend. Your rank updates after every quiz." },
     },
     {
-      front: { icon: "🎯", title: "Adaptive Path", stat: "Personalized for you" },
+      front: { icon: <Target size={28} />, title: "Adaptive Path", stat: "Personalized for you" },
       back: { title: "Smart Learning", text: "Topics below 60% accuracy are automatically flagged and get more questions in the next session. Gyantra learns your weak spots." },
     },
     {
-      front: { icon: "🔖", title: "Bookmarks", stat: "Review anytime" },
+      front: { icon: <Bookmark size={28} />, title: "Bookmarks", stat: "Review anytime" },
       back: { title: "Study Smarter", text: "Bookmark any question mid-quiz, add your own notes, and build a personal revision library. Review saved questions before exams." },
     },
     {
-      front: { icon: "⏱", title: "Live Timer", stat: "Per-question timing" },
+      front: { icon: <Clock size={28} />, title: "Live Timer", stat: "Per-question timing" },
       back: { title: "Exam Simulation", text: "Customizable time per question, a live question-map sidebar, progress tracking, and instant post-submit answer review with explanations." },
     },
   ];
@@ -494,7 +495,7 @@ export default function GyantraLanding() {
       background: linear-gradient(135deg, #0B1E35 0%, #0A142A 100%);
       border-color: var(--border2); transform: rotateY(180deg);
     }
-    .fc-front-icon { font-size: 2rem; }
+    .fc-front-icon { font-size: 2rem; color: var(--cyan); }
     .fc-front-title { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--cyan); letter-spacing: 1px; }
     .fc-front-stat { font-size: 11px; color: var(--text3); letter-spacing: 1px; }
     .fc-front-hint { font-size: 10px; color: var(--text3); letter-spacing: 1px; text-align: right; opacity: 0.6; }

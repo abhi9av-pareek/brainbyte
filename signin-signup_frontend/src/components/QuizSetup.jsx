@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Sigma, Atom, FlaskConical, Cpu, Monitor, PenLine, Shuffle, Lightbulb, Zap, ClipboardList, Check, Brain } from "lucide-react";
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
@@ -132,12 +133,12 @@ const css = `
 `;
 
 const SUBJECTS = [
-  { name: "Mathematics", icon: "✦" },
-  { name: "Physics", icon: "⚛" },
-  { name: "DSA", icon: "⚗" },
-  { name: "Operating System", icon: "🌿" },
-  { name: "Comp. Science", icon: "💻" },
-  { name: "Aptitude", icon: "✍" },
+  { name: "Mathematics", icon: <Sigma size={22} /> },
+  { name: "Physics", icon: <Atom size={22} /> },
+  { name: "DSA", icon: <FlaskConical size={22} /> },
+  { name: "Operating System", icon: <Cpu size={22} /> },
+  { name: "Comp. Science", icon: <Monitor size={22} /> },
+  { name: "Aptitude", icon: <PenLine size={22} /> },
 ];
 
 const POPULAR_EXAMS = [
@@ -183,7 +184,7 @@ const DIFFICULTIES = [
 const OPTIONS = [
   {
     id: "shuffle",
-    icon: "🔀",
+    icon: <Shuffle size={16} />,
     bg: "rgba(124,92,252,0.12)",
     name: "Shuffle questions",
     desc: "Random order each time",
@@ -191,7 +192,7 @@ const OPTIONS = [
   },
   {
     id: "hints",
-    icon: "💡",
+    icon: <Lightbulb size={16} />,
     bg: "rgba(0,229,192,0.1)",
     name: "Show hints",
     desc: "Get a clue if stuck",
@@ -199,7 +200,7 @@ const OPTIONS = [
   },
   {
     id: "instant",
-    icon: "⚡",
+    icon: <Zap size={16} />,
     bg: "rgba(255,179,71,0.1)",
     name: "Instant feedback",
     desc: "See answer immediately",
@@ -207,7 +208,7 @@ const OPTIONS = [
   },
   {
     id: "review",
-    icon: "📋",
+    icon: <ClipboardList size={16} />,
     bg: "rgba(255,107,107,0.1)",
     name: "End review",
     desc: "Detailed result summary",
@@ -229,7 +230,7 @@ function Stepper({ step }) {
               <div
                 className={`bb-step-circle${isDone ? " done" : isActive ? " active" : ""}`}
               >
-                {isDone ? "✓" : num}
+                {isDone ? <Check size={14} /> : num}
               </div>
               <div
                 className={`bb-step-label${isDone ? " done" : isActive ? " active" : ""}`}
@@ -593,7 +594,7 @@ export default function QuizSetup() {
                 </div>
               </div>
               <div className="bb-est-box">
-                <div className="bb-est-icon">🧠</div>
+                <div className="bb-est-icon" style={{ display: "flex", alignItems: "center" }}><Brain size={20} /></div>
                 <div className="bb-est-text">
                   <strong>{questions} questions</strong> in{" "}
                   <strong>{difficulty}</strong> mode on{" "}

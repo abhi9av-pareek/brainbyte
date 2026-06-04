@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { Sigma, Atom, FlaskConical, Leaf, Monitor, PenLine, BookOpen, Shuffle, Target, Bookmark, Users, Flame, X, Brain } from "lucide-react";
+import { AvatarRender } from "./Profile";
 
 /* ─── CSS ─── */
 const css = `
@@ -188,44 +190,44 @@ const css = `
 /* ─── Subject color/icon config ─── */
 const SUBJECT_CONFIG = {
   Mathematics: {
-    icon: "✦",
+    icon: <Sigma size={20} />,
     color: "purple",
     fill: "fill-purple",
     iconCls: "icon-purple",
   },
   Physics: {
-    icon: "⚛",
+    icon: <Atom size={20} />,
     color: "teal",
     fill: "fill-teal",
     iconCls: "icon-teal",
   },
   Chemistry: {
-    icon: "⚗",
+    icon: <FlaskConical size={20} />,
     color: "coral",
     fill: "fill-coral",
     iconCls: "icon-coral",
   },
   Biology: {
-    icon: "🌿",
+    icon: <Leaf size={20} />,
     color: "amber",
     fill: "fill-amber",
     iconCls: "icon-amber",
   },
   "Comp. Science": {
-    icon: "💻",
+    icon: <Monitor size={20} />,
     color: "blue",
     fill: "fill-blue",
     iconCls: "icon-blue",
   },
   English: {
-    icon: "✍",
+    icon: <PenLine size={20} />,
     color: "pink",
     fill: "fill-pink",
     iconCls: "icon-pink",
   },
 };
 const DEFAULT_CONFIG = {
-  icon: "📚",
+  icon: <BookOpen size={20} />,
   color: "purple",
   fill: "fill-purple",
   iconCls: "icon-purple",
@@ -384,7 +386,7 @@ function Dashboard() {
           </ul>
 
           <div className="bb-nav-right">
-            <div className="bb-streak">🔥 {user.streak} day streak</div>
+            <div className="bb-streak"><Flame size={14} /> {user.streak} day streak</div>
             <button
               className="bb-theme-btn"
               onClick={toggleTheme}
@@ -398,19 +400,10 @@ function Dashboard() {
             </button>
 
             <div
-              className="bb-avatar"
               onClick={() => setOpenProfile(true)}
               style={{ cursor: "pointer" }}
             >
-              {user.avatar ? (
-                user.avatar.startsWith("data:") || user.avatar.startsWith("http") ? (
-                  <img src={user.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
-                ) : (
-                  <span style={{ fontSize: 18 }}>{user.avatar}</span>
-                )
-              ) : (
-                user.name[0]
-              )}
+              <AvatarRender avatar={user.avatar} name={user.name} size={36} fontSize={14} />
             </div>
           </div>
         </nav>
@@ -428,7 +421,7 @@ function Dashboard() {
               <div className="bb-hero-text">
                 {level && <div className="bb-level-badge">{level}</div>}
                 <h1>
-                  Welcome back, <span>{user.name}!</span> 🫡
+                  Welcome back, <span>{user.name}!</span>
                 </h1>
                 <p>
                   {recentToday.length > 0
@@ -467,7 +460,7 @@ function Dashboard() {
               </div>
               <div className="bb-hero-visual">
                 <div className="bb-brain-orb">
-                  <div className="bb-brain-inner">🧠</div>
+                  <div className="bb-brain-inner"><Brain size={52} strokeWidth={1.5} /></div>
                 </div>
               </div>
             </div>
@@ -475,14 +468,14 @@ function Dashboard() {
             {/* ── QUICK ACTIONS ── */}
             <div className="bb-quick-row">
               <div className="bb-quick-btn" onClick={handleRandomQuiz}>
-                <div className="qb-icon">🎲</div>
+                <div className="qb-icon" style={{ display: "flex", justifyContent: "center" }}><Shuffle size={20} /></div>
                 <div className="qb-label">Random Quiz</div>
               </div>
               <div
                 className="bb-quick-btn"
                 onClick={() => setShowWeakTopics((p) => !p)}
               >
-                <div className="qb-icon">🎯</div>
+                <div className="qb-icon" style={{ display: "flex", justifyContent: "center" }}><Target size={20} /></div>
                 <div className="qb-label">Weak Topics</div>
               </div>
               <div
@@ -491,7 +484,7 @@ function Dashboard() {
                   alert("Bookmarks vault is under construction… coming soon!")
                 }
               >
-                <div className="qb-icon">🔖</div>
+                <div className="qb-icon" style={{ display: "flex", justifyContent: "center" }}><Bookmark size={20} /></div>
                 <div className="qb-label" style={{ cursor: "pointer" }}>
                   Bookmarks
                 </div>
@@ -500,7 +493,7 @@ function Dashboard() {
                 className="bb-quick-btn"
                 onClick={() => alert("Challenge feature coming soon!")}
               >
-                <div className="qb-icon">👥</div>
+                <div className="qb-icon" style={{ display: "flex", justifyContent: "center" }}><Users size={20} /></div>
                 <div className="qb-label">Challenge</div>
               </div>
             </div>
@@ -717,7 +710,7 @@ function Dashboard() {
               className="bb-sidebar-close"
               onClick={() => setOpenProfile(false)}
             >
-              ✖
+              <X size={16} />
             </button>
           </div>
           <div className="bb-sidebar-user">

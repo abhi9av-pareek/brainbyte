@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { Sigma, Atom, FlaskConical, Leaf, Monitor, PenLine, BookOpen, ClipboardList, Zap, Trophy } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -99,14 +100,14 @@ const css = `
 `;
 
 const SUBJECT_CONFIG = {
-  Mathematics: { icon: "✦", bg: "rgba(124,92,252,0.15)" },
-  Physics: { icon: "⚛", bg: "rgba(0,229,192,0.12)" },
-  Chemistry: { icon: "⚗", bg: "rgba(255,107,107,0.13)" },
-  Biology: { icon: "🌿", bg: "rgba(255,179,71,0.13)" },
-  "Comp. Science": { icon: "💻", bg: "rgba(56,149,255,0.13)" },
-  English: { icon: "✍", bg: "rgba(255,100,180,0.13)" },
+  Mathematics: { icon: <Sigma size={18} />, bg: "rgba(124,92,252,0.15)" },
+  Physics: { icon: <Atom size={18} />, bg: "rgba(0,229,192,0.12)" },
+  Chemistry: { icon: <FlaskConical size={18} />, bg: "rgba(255,107,107,0.13)" },
+  Biology: { icon: <Leaf size={18} />, bg: "rgba(255,179,71,0.13)" },
+  "Comp. Science": { icon: <Monitor size={18} />, bg: "rgba(56,149,255,0.13)" },
+  English: { icon: <PenLine size={18} />, bg: "rgba(255,100,180,0.13)" },
 };
-const DEFAULT_CONFIG = { icon: "📚", bg: "rgba(124,92,252,0.15)" };
+const DEFAULT_CONFIG = { icon: <BookOpen size={18} />, bg: "rgba(124,92,252,0.15)" };
 
 const getScoreColor = (pct) => {
   if (pct >= 90) return "var(--accent2)";
@@ -262,7 +263,7 @@ export default function ResultsHistory() {
               </div>
               <div className="rh-sum-card">
                 <div className="rh-sum-val" style={{ color: "var(--amber)" }}>
-                  🏆 {bestScore}%
+                  <Trophy size={18} style={{ marginRight: 4 }} /> {bestScore}%
                 </div>
                 <div className="rh-sum-key">Best Score</div>
               </div>
@@ -298,7 +299,7 @@ export default function ResultsHistory() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="rh-empty">
-              <div className="rh-empty-icon">📋</div>
+              <div className="rh-empty-icon" style={{ display: "flex", justifyContent: "center" }}><ClipboardList size={48} /></div>
               <div className="rh-empty-title">
                 {totalQuizzes === 0
                   ? "No quizzes yet"
@@ -313,7 +314,7 @@ export default function ResultsHistory() {
                 className="rh-btn rh-btn-primary"
                 onClick={() => navigate("/QuizSetup")}
               >
-                ⚡ Start a Quiz
+                <Zap size={14} /> Start a Quiz
               </button>
             </div>
           ) : (

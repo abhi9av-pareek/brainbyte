@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { AlertTriangle, AlertCircle, CheckCircle, BookOpen, Rocket, BarChart3, FileText, Flame } from "lucide-react";
 
 /* ─── CSS ─── */
 const css = `
@@ -266,7 +267,7 @@ const generateSuggestions = (topicStats, scorePercent) => {
     .slice(0, 3)
     .forEach((t) => {
       suggestions.push({
-        icon: t.pct < 40 ? "🚨" : "⚠️",
+        icon: t.pct < 40 ? <AlertTriangle size={16} /> : <AlertCircle size={16} />,
         cls: t.pct < 40 ? "sug-warn" : "sug-tip",
         title: `Revise "${t.topic}"`,
         text:
@@ -282,7 +283,7 @@ const generateSuggestions = (topicStats, scorePercent) => {
     .slice(0, 1)
     .forEach((t) => {
       suggestions.push({
-        icon: "✅",
+        icon: <CheckCircle size={16} />,
         cls: "sug-ok",
         title: `Strong in "${t.topic}"`,
         text: `You nailed this topic with ${t.pct}%. Keep it sharp by attempting harder difficulty next time.`,
@@ -292,14 +293,14 @@ const generateSuggestions = (topicStats, scorePercent) => {
   /* overall suggestion */
   if (scorePercent < 50) {
     suggestions.push({
-      icon: "📖",
+      icon: <BookOpen size={16} />,
       cls: "sug-tip",
       title: "Review Strategy",
       text: "Try switching to Easy difficulty first to build a strong foundation, then gradually increase.",
     });
   } else if (scorePercent >= 85) {
     suggestions.push({
-      icon: "🚀",
+      icon: <Rocket size={16} />,
       cls: "sug-ok",
       title: "Challenge Yourself",
       text: "You're performing well! Try Hard difficulty or add more subjects to push your limits.",
@@ -479,7 +480,7 @@ export default function Results() {
                 )}
                 {newStreak > 0 && (
                   <div className="rs-streak-badge">
-                    🔥 {newStreak} day streak
+                    <Flame size={14} /> {newStreak} day streak
                   </div>
                 )}
               </div>
@@ -509,7 +510,7 @@ export default function Results() {
           {/* ── TOPIC PERFORMANCE ── */}
           {topicStats.length > 0 && (
             <div className="rs-section rs-fadein-3">
-              <div className="rs-section-title">📊 Topic Performance</div>
+              <div className="rs-section-title" style={{ display: "flex", alignItems: "center", gap: 8 }}><BarChart3 size={16} /> Topic Performance</div>
               {topicStats.map((t) => (
                 <div key={t.topic} className="rs-topic-row">
                   <div className="rs-topic-header">
@@ -544,7 +545,7 @@ export default function Results() {
           {/* ── SUGGESTIONS ── */}
           {suggestions.length > 0 && (
             <div className="rs-section rs-fadein-3">
-              <div className="rs-section-title">💡 What to do next</div>
+              <div className="rs-section-title" style={{ display: "flex", alignItems: "center", gap: 8 }}><Rocket size={16} /> What to do next</div>
               {suggestions.map((s, i) => (
                 <div key={i} className="rs-suggestion-item">
                   <div className={`rs-sug-icon ${s.cls}`}>{s.icon}</div>
@@ -560,7 +561,7 @@ export default function Results() {
           {/* ── QUESTION REVIEW ── */}
           {questions.length > 0 && (
             <div className="rs-section rs-fadein-4">
-              <div className="rs-section-title">📝 Question Review</div>
+              <div className="rs-section-title" style={{ display: "flex", alignItems: "center", gap: 8 }}><FileText size={16} /> Question Review</div>
               <div className="rs-tabs">
                 {["all", "correct", "wrong", "skipped"].map((tab) => (
                   <button

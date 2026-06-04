@@ -1,13 +1,47 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../utils/axiosConfig";
+import { Bot, Gamepad2, Brain, Code2, Zap, Rocket, Target, Microscope, Globe, Orbit, CircuitBoard, Dna, Atom, Telescope, Trophy, Bird, Flame, Waves, Gem, Cat, Dog, Skull, Moon, Compass } from "lucide-react";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    AVATAR RENDERER  (exported so Dashboard/navbar can reuse it)
 ───────────────────────────────────────────────────────────────────────────── */
+/* ─── SVG Avatar Map ─── */
+const SVG_AVATAR_MAP = {
+  "svg:robot": (s) => <Bot size={s} />,
+  "svg:gamepad": (s) => <Gamepad2 size={s} />,
+  "svg:brain": (s) => <Brain size={s} />,
+  "svg:code": (s) => <Code2 size={s} />,
+  "svg:zap": (s) => <Zap size={s} />,
+  "svg:rocket": (s) => <Rocket size={s} />,
+  "svg:target": (s) => <Target size={s} />,
+  "svg:microscope": (s) => <Microscope size={s} />,
+  "svg:globe": (s) => <Globe size={s} />,
+  "svg:ufo": (s) => <Orbit size={s} />,
+  "svg:circuit": (s) => <CircuitBoard size={s} />,
+  "svg:dna": (s) => <Dna size={s} />,
+  "svg:atom": (s) => <Atom size={s} />,
+  "svg:telescope": (s) => <Telescope size={s} />,
+  "svg:trophy": (s) => <Trophy size={s} />,
+  "svg:bird": (s) => <Bird size={s} />,
+  "svg:flame": (s) => <Flame size={s} />,
+  "svg:waves": (s) => <Waves size={s} />,
+  "svg:gem": (s) => <Gem size={s} />,
+  "svg:cat": (s) => <Cat size={s} />,
+  "svg:dog": (s) => <Dog size={s} />,
+  "svg:skull": (s) => <Skull size={s} />,
+  "svg:moon": (s) => <Moon size={s} />,
+  "svg:compass": (s) => <Compass size={s} />,
+};
+
 export function AvatarRender({ avatar, name, size = 96, fontSize = 38 }) {
+  const svgSize = Math.round(fontSize * 1.1);
+  const renderFn = avatar ? SVG_AVATAR_MAP[avatar] : null;
+
   const inner = avatar ? (
-    avatar.startsWith("data:") || avatar.startsWith("http") ? (
+    renderFn ? (
+      <span style={{ color: "var(--accent2, #00E5C0)" }}>{renderFn(svgSize)}</span>
+    ) : avatar.startsWith("data:") || avatar.startsWith("http") ? (
       <img
         src={avatar}
         alt="avatar"
@@ -42,18 +76,18 @@ export function AvatarRender({ avatar, name, size = 96, fontSize = 38 }) {
    CONSTANTS
 ───────────────────────────────────────────────────────────────────────────── */
 const TECH_AVATARS = [
-  { emoji: "🤖", label: "Robot" }, { emoji: "👾", label: "Alien" },
-  { emoji: "🧠", label: "Brain" }, { emoji: "💻", label: "Dev" },
-  { emoji: "⚡", label: "Flash" }, { emoji: "🚀", label: "Rocket" },
-  { emoji: "🎯", label: "Target" }, { emoji: "🔬", label: "Sci" },
-  { emoji: "🌐", label: "Globe" }, { emoji: "🛸", label: "UFO" },
-  { emoji: "🦾", label: "Cyborg" }, { emoji: "🧬", label: "DNA" },
-  { emoji: "⚛", label: "Atom" }, { emoji: "🔭", label: "Space" },
-  { emoji: "🎮", label: "Gaming" }, { emoji: "🏆", label: "Champ" },
-  { emoji: "🦉", label: "Owl" }, { emoji: "🐉", label: "Dragon" },
-  { emoji: "🌊", label: "Wave" }, { emoji: "🔮", label: "Crystal" },
-  { emoji: "🦊", label: "Fox" }, { emoji: "🐺", label: "Wolf" },
-  { emoji: "🦁", label: "Lion" }, { emoji: "🌙", label: "Moon" },
+  { key: "svg:robot", label: "Robot" }, { key: "svg:gamepad", label: "Gamer" },
+  { key: "svg:brain", label: "Brain" }, { key: "svg:code", label: "Dev" },
+  { key: "svg:zap", label: "Flash" }, { key: "svg:rocket", label: "Rocket" },
+  { key: "svg:target", label: "Target" }, { key: "svg:microscope", label: "Sci" },
+  { key: "svg:globe", label: "Globe" }, { key: "svg:ufo", label: "UFO" },
+  { key: "svg:circuit", label: "Cyborg" }, { key: "svg:dna", label: "DNA" },
+  { key: "svg:atom", label: "Atom" }, { key: "svg:telescope", label: "Space" },
+  { key: "svg:trophy", label: "Champ" }, { key: "svg:bird", label: "Bird" },
+  { key: "svg:flame", label: "Flame" }, { key: "svg:waves", label: "Wave" },
+  { key: "svg:gem", label: "Crystal" }, { key: "svg:cat", label: "Cat" },
+  { key: "svg:dog", label: "Dog" }, { key: "svg:skull", label: "Skull" },
+  { key: "svg:moon", label: "Moon" }, { key: "svg:compass", label: "Explore" },
 ];
 
 const EDUCATION_LEVELS = ["School", "College", "Graduate", "Postgraduate", "Professional", "Self-taught"];
@@ -664,16 +698,18 @@ export default function Profile() {
                   {TECH_AVATARS.map((a, i) => (
                     <div
                       key={i}
-                      className={`pf-avatar-option${profile.avatar === a.emoji ? " selected" : ""}`}
-                      onClick={() => { setProfile(p => ({ ...p, avatar: a.emoji })); setHasChange(true); }}
+                      className={`pf-avatar-option${profile.avatar === a.key ? " selected" : ""}`}
+                      onClick={() => { setProfile(p => ({ ...p, avatar: a.key })); setHasChange(true); }}
                       title={a.label}
                     >
-                      {profile.avatar === a.emoji && (
+                      {profile.avatar === a.key && (
                         <div className="pf-avatar-selected-check">
                           <IconCheck size={9} />
                         </div>
                       )}
-                      <span style={{ fontSize: 24 }}>{a.emoji}</span>
+                      <span style={{ fontSize: 24, color: "var(--accent2, #00E5C0)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        {SVG_AVATAR_MAP[a.key] ? SVG_AVATAR_MAP[a.key](24) : a.key}
+                      </span>
                       <span className="pf-avatar-option-label">{a.label}</span>
                     </div>
                   ))}
