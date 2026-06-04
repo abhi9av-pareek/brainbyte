@@ -13,6 +13,10 @@ const app = express();
 const allowedOrigins = [
   "https://brainnbyte.netlify.app", // current live deployment
   "https://gyantra.netlify.app", // future renamed deployment
+  "https://gyantraa.in",            // custom domain (HTTPS)
+  "http://gyantraa.in",             // custom domain (HTTP, until redirect enforced)
+  "https://www.gyantraa.in",        // custom domain with www
+  "http://www.gyantraa.in",         // custom domain with www (HTTP)
 ];
 const isLocalDevOrigin = (origin) =>
   /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
