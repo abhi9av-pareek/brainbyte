@@ -10,6 +10,7 @@ import Results from "./components/Results";
 import Analytics from "./components/Analytics";
 import Profile from "./components/Profile";
 import GyantraLanding from "./components/GyantraLanding";
+import Bookmarks from "./components/Bookmarks";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/results/history" element={<ResultsHistory />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/profile"   element={<Profile />} />
+          <Route path="/bookmarks" element={<Bookmarks />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

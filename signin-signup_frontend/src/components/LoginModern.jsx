@@ -604,6 +604,40 @@ function LoginModern() {
         }
 
         /* ══════════════════════════════════
+           LIGHT MODE
+        ══════════════════════════════════ */
+        [data-theme="light"] .gl-root { background: #F5F7FA; }
+        [data-theme="light"] .gl-left {
+          background:
+            radial-gradient(ellipse 80% 60% at 30% 50%, rgba(0,184,150,0.06) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 50% at 80% 20%, rgba(124,92,252,0.04) 0%, transparent 60%),
+            linear-gradient(180deg, #EFF1F5 0%, #E8EAF2 100%);
+        }
+        [data-theme="light"] .gl-left-logo-text { color: #1A1A2E; }
+        [data-theme="light"] .gl-left-tagline { color: #1A1A2E; }
+        [data-theme="light"] .gl-left-sub { color: #555566; }
+        [data-theme="light"] .gl-shape-4 { background: #E0E2EA; border-color: rgba(0,184,150,0.3); }
+        [data-theme="light"] .gl-phone { background: #E0E2EA; border-color: rgba(0,184,150,0.2); }
+        [data-theme="light"] .gl-phone::before { background: linear-gradient(180deg, rgba(0,184,150,0.1) 0%, rgba(124,92,252,0.06) 100%); }
+        [data-theme="light"] .gl-right {
+          background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FA 50%, #FFFFFF 100%);
+          border-left-color: rgba(0,0,0,0.06);
+        }
+        [data-theme="light"] .gl-heading { color: #1A1A2E; }
+        [data-theme="light"] .gl-subheading { color: #555566; }
+        [data-theme="light"] .gl-label { color: #555566; }
+        [data-theme="light"] .gl-input { color: #1A1A2E; border-bottom-color: rgba(0,0,0,0.12); }
+        [data-theme="light"] .gl-input::placeholder { color: #999; }
+        [data-theme="light"] .gl-input:focus { border-color: #00B896; box-shadow: 0 2px 12px rgba(0,184,150,0.1); }
+        [data-theme="light"] .gl-eye-btn { color: #888; }
+        [data-theme="light"] .gl-remember { color: #555566; }
+        [data-theme="light"] .gl-btn-google { color: #1A1A2E; border-color: rgba(0,0,0,0.12); }
+        [data-theme="light"] .gl-btn-google:hover { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.2); }
+        [data-theme="light"] .gl-signup-nudge { color: #555566; }
+        [data-theme="light"] .gl-footer { color: rgba(0,0,0,0.3); }
+        [data-theme="light"] .gl-form-icon { background: linear-gradient(135deg, rgba(0,184,150,0.1) 0%, rgba(124,92,252,0.06) 100%); border-color: rgba(0,184,150,0.15); }
+
+        /* ══════════════════════════════════
            RESPONSIVE
         ══════════════════════════════════ */
         @media (max-width: 900px) {

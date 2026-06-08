@@ -160,6 +160,66 @@ const css = `
   .rs-fadein-2 { animation: rs-fadein .5s .1s ease both; }
   .rs-fadein-3 { animation: rs-fadein .5s .2s ease both; }
   .rs-fadein-4 { animation: rs-fadein .5s .3s ease both; }
+
+  /* ── Light mode fixes ── */
+  [data-theme="light"] .rs-btn-ghost { background: rgba(0,0,0,0.04); }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .rs-nav { padding: 0 1rem; height: 50px; }
+    .rs-logo { font-size: 16px; }
+    .rs-logo-icon { width: 24px; height: 24px; }
+    .rs-main { padding: 1.25rem 1rem 3rem; }
+
+    .rs-hero { flex-direction: column; gap: 1.5rem; padding: 1.5rem; text-align: center; }
+    .rs-ring-wrap { width: 110px; height: 110px; }
+    .rs-ring-wrap svg { width: 110px; height: 110px; }
+    .rs-ring-pct { font-size: 24px; }
+    .rs-hero-title { font-size: 20px; }
+    .rs-hero-sub { font-size: 13px; }
+    .rs-xp-row { justify-content: center; flex-wrap: wrap; }
+
+    .rs-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .rs-stat-val { font-size: 20px; }
+
+    .rs-section { padding: 1.25rem; }
+    .rs-section-title { font-size: 14px; }
+
+    .rs-nav-right { gap: 6px; }
+    .rs-btn { padding: 8px 16px; font-size: 13px; }
+
+    .rs-q-header { padding: 10px 12px; }
+    .rs-q-body { padding: 10px 12px; }
+    .rs-q-text { font-size: 12px; }
+
+    .rs-cta { padding: 1.5rem; }
+    .rs-cta-title { font-size: 18px; }
+    .rs-cta-btns { flex-direction: column; }
+    .rs-cta-btns .rs-btn { width: 100%; justify-content: center; }
+
+    .rs-quote-card { padding: 1.5rem; }
+    .rs-quote-text { font-size: 15px; }
+
+    .rs-footer { padding: 0.75rem 1rem; }
+  }
+
+  @media (max-width: 480px) {
+    .rs-nav { padding: 0 0.75rem; }
+    .rs-main { padding: 1rem 0.75rem 2.5rem; }
+    .rs-hero { padding: 1.25rem; border-radius: 16px; }
+    .rs-ring-wrap { width: 90px; height: 90px; }
+    .rs-ring-wrap svg { width: 90px; height: 90px; }
+    .rs-ring-pct { font-size: 20px; }
+    .rs-hero-title { font-size: 18px; }
+    .rs-hero-badge { font-size: 10px; padding: 3px 10px; }
+    .rs-xp-badge, .rs-streak-badge { font-size: 11px; padding: 4px 10px; }
+    .rs-stats-grid { gap: 6px; }
+    .rs-stat-card { padding: 0.75rem; }
+    .rs-stat-val { font-size: 18px; }
+    .rs-stat-key { font-size: 10px; }
+    .rs-tabs { flex-wrap: wrap; }
+    .rs-tab { font-size: 11px; padding: 5px 10px; }
+  }
 `;
 
 /* ─── Data ─── */

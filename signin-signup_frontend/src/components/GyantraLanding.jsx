@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Zap, Target, BarChart3, Bookmark, Trophy, Lightbulb, Clock, Check, Sparkles } from "lucide-react";
+import { Zap, Target, BarChart3, Bookmark, Trophy, Lightbulb, Clock, Check, Sparkles, Sun, Moon } from "lucide-react";
+import { useTheme } from "../contexts/ThemeContext";
 
 /* ─── Animated counter ─── */
 function Counter({ to, suffix = "", duration = 2000 }) {
@@ -180,6 +181,7 @@ function CardStack({ cards }) {
 ══════════════════════════════════════════════════════ */
 export default function GyantraLanding() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
@@ -597,6 +599,68 @@ export default function GyantraLanding() {
     /* Float animation class */
     .g-card-stack-float { animation: float3d 6s ease-in-out infinite; }
 
+    /* ── THEME TOGGLE ── */
+    .g-theme-btn {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .2s; color: var(--text2);
+    }
+    .g-theme-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ════════════════════════════════════
+       LIGHT MODE
+    ════════════════════════════════════ */
+    [data-theme="light"] {
+      --bg: #F5F7FA; --bg2: #EFF1F5; --surface: #FFFFFF;
+      --surf2: #F0F2F8; --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.15);
+      --cyan: #00B896; --cyan2: #009E82; --cyan3: rgba(0,184,150,0.08);
+      --purple: #7C5CFC; --text: #1A1A2E; --text2: #555566; --text3: #888899;
+    }
+    [data-theme="light"] body { background: var(--bg); color: var(--text); }
+    [data-theme="light"] .g-nav.scrolled { background: rgba(245,247,250,0.95); }
+    [data-theme="light"] .g-hero-bg {
+      background: radial-gradient(ellipse 80% 60% at 60% 50%, rgba(0,184,150,0.06) 0%, transparent 70%),
+                  radial-gradient(ellipse 40% 40% at 80% 20%, rgba(0,100,80,0.04) 0%, transparent 60%),
+                  radial-gradient(ellipse 50% 50% at 20% 80%, rgba(124,92,252,0.04) 0%, transparent 60%),
+                  linear-gradient(180deg, #F5F7FA 0%, #EFF1F5 100%);
+    }
+    [data-theme="light"] .g-hero-grid {
+      background-image: linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    }
+    [data-theme="light"] .quiz-preview-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0F2F8 100%);
+    }
+    [data-theme="light"] .qpc-opt { background: rgba(0,0,0,0.03); }
+    [data-theme="light"] .flip-card-front {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F0F2F8 100%);
+    }
+    [data-theme="light"] .flip-card-back {
+      background: linear-gradient(135deg, #F0F2F8 0%, #E8EAF2 100%);
+    }
+    [data-theme="light"] .how-card { background: #FFFFFF; }
+    [data-theme="light"] .how-card:hover { box-shadow: 0 20px 50px rgba(0,0,0,0.08), 0 0 30px rgba(0,184,150,0.06); }
+    [data-theme="light"] .how-num { -webkit-text-stroke: 1px rgba(0,184,150,0.2); }
+    [data-theme="light"] .g-stat-card { background: #FFFFFF; }
+    [data-theme="light"] .g-stat-card:hover { box-shadow: 0 0 30px rgba(0,184,150,0.06); }
+    [data-theme="light"] .g-stats-section {
+      background: linear-gradient(180deg, transparent 0%, rgba(0,184,150,0.03) 50%, transparent 100%);
+    }
+    [data-theme="light"] .g-stats-section::before {
+      background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(0,184,150,0.04) 0%, transparent 70%);
+    }
+    [data-theme="light"] .g-cta-glow { background: rgba(0,184,150,0.04); }
+    [data-theme="light"] .g-mobile-menu { background: rgba(245,247,250,0.97); }
+    [data-theme="light"] .g-mobile-menu a { color: var(--text); }
+    [data-theme="light"] .g-footer { background: var(--bg); }
+    [data-theme="light"] .stack-btn { background: #FFFFFF; }
+    [data-theme="light"] .g-btn-lg-primary { color: #FFFFFF; }
+    [data-theme="light"] .g-btn-primary { color: #FFFFFF; }
+    [data-theme="light"] .g-theme-btn { background: rgba(0,0,0,0.05); }
+    [data-theme="light"] ::-webkit-scrollbar-track { background: var(--bg); }
+    [data-theme="light"] ::-webkit-scrollbar-thumb { background: var(--cyan); }
+
     /* ════════════════════════════════════
        RESPONSIVE — TABLET (≤ 900px)
     ════════════════════════════════════ */
@@ -753,6 +817,9 @@ export default function GyantraLanding() {
         </ul>
 
         <div className="g-nav-cta">
+          <button className="g-theme-btn" onClick={toggleTheme} title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
           <button className="g-btn-outline" onClick={() => navigate("/login")}>Log In</button>
           <button className="g-btn-primary" onClick={() => navigate("/signup")}>Sign Up Free</button>
         </div>

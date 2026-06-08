@@ -130,6 +130,45 @@ const css = `
   .bb-btn-ghost:hover { background: rgba(255,255,255,0.09); }
   .bb-btn-start { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0A0B0F; flex: 1; font-size: 15px; }
   .bb-btn-start:hover { opacity: .9; transform: translateY(-1px); }
+
+  /* ── Light mode fix ── */
+  [data-theme="light"] .bb-btn-ghost { background: rgba(0,0,0,0.04); }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .bb-main { padding: 1.5rem 1rem 3rem; }
+    .bb-stepper-wrap { padding: 1.25rem 1rem 0; flex-wrap: wrap; gap: 4px; }
+    .bb-step-line { width: 24px; }
+    .bb-step-label { font-size: 10px; }
+    .bb-panel-title { font-size: 22px; }
+    .bb-subj-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .bb-diff-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .bb-opt-row { grid-template-columns: 1fr; gap: 8px; }
+    .bb-btn-row { flex-direction: column; }
+    .bb-btn-row .bb-btn { width: 100%; justify-content: center; }
+    .bb-custom-input-row { flex-direction: column; }
+    .bb-custom-add-btn { width: 100%; }
+  }
+
+  @media (max-width: 480px) {
+    .bb-main { padding: 1.25rem 0.75rem 2.5rem; }
+    .bb-stepper-wrap { padding: 1rem 0.5rem 0; }
+    .bb-step-circle { width: 26px; height: 26px; font-size: 11px; }
+    .bb-step-line { width: 16px; }
+    .bb-step-label { font-size: 9px; }
+    .bb-panel-title { font-size: 20px; }
+    .bb-panel-sub { font-size: 13px; }
+    .bb-subj-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .bb-subj-card { padding: 0.75rem; }
+    .bb-subj-card .s-name { font-size: 12px; }
+    .bb-diff-grid { grid-template-columns: 1fr; gap: 8px; }
+    .bb-diff-card { padding: 1rem; }
+    .bb-slider-section { padding: 1rem; }
+    .bb-slider-val { font-size: 18px; }
+    .bb-opt-card { padding: 0.75rem; }
+    .bb-summary-card { padding: 1rem; }
+    .bb-est-box { padding: 0.75rem 1rem; }
+  }
 `;
 
 const SUBJECTS = [

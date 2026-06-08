@@ -97,6 +97,50 @@ const css = `
 
   @keyframes rh-fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   .rh-fadein { animation: rh-fadein .4s ease forwards; }
+
+  /* ── Light mode fixes ── */
+  [data-theme="light"] .rh-btn-ghost { background: rgba(0,0,0,0.04); }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .rh-nav { padding: 0 1rem; height: 50px; }
+    .rh-nav-links { display: none; }
+    .rh-logo { font-size: 16px; }
+    .rh-logo-icon { width: 24px; height: 24px; }
+    .rh-main { padding: 1.25rem 1rem 3rem; }
+
+    .rh-summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .rh-sum-val { font-size: 18px; }
+
+    .rh-filters { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .rh-filter-btn { white-space: nowrap; flex-shrink: 0; }
+
+    .rh-quiz-card { padding: 1rem; gap: 10px; }
+    .rh-quiz-icon { width: 36px; height: 36px; }
+    .rh-quiz-subject { font-size: 14px; }
+    .rh-quiz-meta { font-size: 11px; gap: 8px; }
+    .rh-score-pct { font-size: 18px; }
+
+    .rh-footer { padding: 0.75rem 1rem; }
+  }
+
+  @media (max-width: 480px) {
+    .rh-nav { padding: 0 0.75rem; }
+    .rh-nav-right { gap: 6px; }
+    .rh-theme-btn { width: 30px; height: 30px; }
+    .rh-btn { padding: 8px 14px; font-size: 12px; }
+    .rh-main { padding: 1rem 0.75rem 2.5rem; }
+
+    .rh-page-title { font-size: 22px; }
+    .rh-summary-grid { gap: 6px; }
+    .rh-sum-card { padding: 0.75rem; }
+    .rh-sum-val { font-size: 16px; }
+    .rh-sum-key { font-size: 10px; }
+
+    .rh-quiz-card { flex-direction: column; align-items: flex-start; }
+    .rh-quiz-score { text-align: left; display: flex; align-items: center; gap: 8px; }
+    .rh-score-pct { font-size: 16px; }
+  }
 `;
 
 const SUBJECT_CONFIG = {

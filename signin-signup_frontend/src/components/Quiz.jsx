@@ -3,6 +3,103 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import axiosInstance from "../utils/axiosConfig"; // use axios so interceptor attaches token
 
+/* ─── Bookmark Popup Modal Component ─── */
+function BookmarkModal({ isOpen, onClose, question, onSave, existingNote }) {
+  const [note, setNote] = useState(existingNote || "");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setNote(existingNote || "");
+      setSaved(false);
+      setTimeout(() => textareaRef.current?.focus(), 200);
+    }
+  }, [isOpen, existingNote]);
+
+  if (!isOpen || !question) return null;
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave(note);
+      setSaved(true);
+      setTimeout(() => {
+        onClose();
+        setSaved(false);
+      }, 1200);
+    } catch (err) {
+      console.error("Bookmark save failed:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSkipNote = async () => {
+    setSaving(true);
+    try {
+      await onSave("");
+      setSaved(true);
+      setTimeout(() => {
+        onClose();
+        setSaved(false);
+      }, 800);
+    } catch (err) {
+      console.error("Bookmark save failed:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="bkm-overlay" onClick={onClose} />
+      <div className={`bkm-popup ${saved ? 'bkm-popup-saved' : ''}`}>
+        {saved ? (
+          <div className="bkm-saved-state">
+            <div className="bkm-saved-icon">✓</div>
+            <div className="bkm-saved-text">Bookmarked!</div>
+          </div>
+        ) : (
+          <>
+            <div className="bkm-header">
+              <div className="bkm-header-left">
+                <span className="bkm-emoji">🔖</span>
+                <span className="bkm-title">Bookmark Question</span>
+              </div>
+              <button className="bkm-close" onClick={onClose}>✕</button>
+            </div>
+            <div className="bkm-question-preview">
+              <div className="bkm-q-label">QUESTION</div>
+              <div className="bkm-q-text">{question}</div>
+            </div>
+            <div className="bkm-note-section">
+              <label className="bkm-note-label">Add a note (optional)</label>
+              <textarea
+                ref={textareaRef}
+                className="bkm-textarea"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Why is this tricky? Key formula? Revision tip..."
+                rows={3}
+              />
+            </div>
+            <div className="bkm-actions">
+              <button className="bkm-skip-btn" onClick={handleSkipNote} disabled={saving}>
+                Save without note
+              </button>
+              <button className="bkm-save-btn" onClick={handleSave} disabled={saving}>
+                {saving ? 'Saving...' : '🔖 Save with Note'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
 /* ─── CSS (converted from gyantra_mcq_quiz.html) ─── */
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
@@ -142,15 +239,122 @@ const css = `
   .qz-next-btn:disabled { background: var(--muted2); color: var(--muted); cursor: not-allowed; transform: none; }
   .qz-finish-btn { background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: 12px; padding: 12px 32px; color: #0A0B0F; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; }
   .qz-finish-btn:hover { opacity: .9; transform: translateY(-1px); }
-  .qz-bookmark-btn { background: none; border: 1px solid var(--muted2); border-radius: 12px; padding: 12px 14px; color: var(--muted); font-size: 16px; cursor: pointer; transition: all .2s; }
+  .qz-bookmark-btn { background: none; border: 1px solid var(--muted2); border-radius: 12px; padding: 12px 14px; color: var(--muted); font-size: 16px; cursor: pointer; transition: all .2s; position: relative; }
   .qz-bookmark-btn:hover { border-color: var(--amber); color: var(--amber); }
   .qz-bookmark-btn.saved { border-color: var(--amber); color: var(--amber); background: rgba(255,179,71,0.08); }
+  .qz-bookmark-btn.saved::after { content: ''; position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: var(--amber); border-radius: 50%; border: 2px solid var(--bg); }
+
+  /* BOOKMARK POPUP MODAL */
+  .bkm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; animation: bkm-fade-in 0.2s ease; }
+  [data-theme="light"] .bkm-overlay { background: rgba(0,0,0,0.35); }
+  @keyframes bkm-fade-in { from { opacity: 0; } to { opacity: 1; } }
+  .bkm-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 440px; max-width: 90vw; max-height: 80vh; background: var(--surface); border: 1px solid var(--border2); border-radius: 20px; z-index: 301; animation: bkm-popup-in 0.3s cubic-bezier(0.34,1.56,0.64,1); overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.35); }
+  [data-theme="light"] .bkm-popup { box-shadow: 0 20px 60px rgba(0,0,0,0.12); }
+  @keyframes bkm-popup-in { from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+  .bkm-popup-saved { animation: bkm-saved-pulse 0.5s ease; }
+  @keyframes bkm-saved-pulse { 0% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.03); } 100% { transform: translate(-50%, -50%) scale(1); } }
+  .bkm-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .bkm-header-left { display: flex; align-items: center; gap: 8px; }
+  .bkm-emoji { font-size: 20px; }
+  .bkm-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+  .bkm-close { background: none; border: 1px solid var(--border2); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); font-size: 14px; transition: all .2s; }
+  .bkm-close:hover { border-color: var(--accent3); color: var(--accent3); }
+  .bkm-question-preview { padding: 16px 20px; background: var(--surface2); }
+  .bkm-q-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .bkm-q-text { font-size: 14px; line-height: 1.55; color: var(--text); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .bkm-note-section { padding: 16px 20px; }
+  .bkm-note-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; display: block; }
+  .bkm-textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px; padding: 12px 14px; font-size: 14px; color: var(--text); font-family: 'DM Sans', sans-serif; resize: vertical; min-height: 70px; outline: none; transition: border-color .2s, box-shadow .2s; }
+  .bkm-textarea::placeholder { color: var(--muted); }
+  .bkm-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,92,252,0.12); }
+  .bkm-actions { display: flex; gap: 10px; padding: 12px 20px 18px; justify-content: flex-end; }
+  .bkm-skip-btn { background: none; border: 1px solid var(--muted2); border-radius: 10px; padding: 9px 18px; color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; }
+  .bkm-skip-btn:hover:not(:disabled) { border-color: var(--border2); color: var(--text); }
+  .bkm-skip-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .bkm-save-btn { background: linear-gradient(135deg, var(--amber), #FF9A3E); border: none; border-radius: 10px; padding: 9px 22px; color: #0A0B0F; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; }
+  .bkm-save-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+  .bkm-save-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .bkm-saved-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 2rem; gap: 10px; }
+  .bkm-saved-icon { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,179,71,0.2), rgba(0,229,192,0.15)); display: flex; align-items: center; justify-content: center; font-size: 26px; color: var(--accent2); animation: bkm-check-in 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes bkm-check-in { from { transform: scale(0); } to { transform: scale(1); } }
+  .bkm-saved-text { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--amber); }
+
+  @media (max-width: 480px) {
+    .bkm-popup { width: 95vw; border-radius: 16px; }
+    .bkm-header { padding: 12px 16px; }
+    .bkm-question-preview { padding: 12px 16px; }
+    .bkm-note-section { padding: 12px 16px; }
+    .bkm-actions { padding: 10px 16px 14px; flex-direction: column; }
+    .bkm-skip-btn, .bkm-save-btn { width: 100%; text-align: center; }
+  }
 
   /* SUBMITTING OVERLAY */
   .qz-overlay { position: fixed; inset: 0; background: rgba(10,11,15,0.85); z-index: 200; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; transition: background .3s; }
   [data-theme="light"] .qz-overlay { background: rgba(245,245,250,0.88); }
   .qz-overlay-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
   .qz-overlay-sub { font-size: 14px; color: var(--muted); }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .qz-nav { padding: 0 1rem; height: 50px; }
+    .qz-nav-meta { display: none; }
+    .qz-logo { font-size: 16px; }
+    .qz-logo-icon { width: 24px; height: 24px; }
+    .qz-main { padding: 1rem 1rem 2rem; }
+
+    .qz-stats-row { gap: 6px; }
+    .qz-stat-chip { padding: 8px 6px; }
+    .qz-stat-chip .sv { font-size: 15px; }
+    .qz-stat-chip .sk { font-size: 10px; }
+
+    .qz-top-row { flex-direction: column; gap: 10px; align-items: flex-start; }
+    .qz-q-num { font-size: 22px; }
+    .qz-timer-wrap { width: 52px; height: 52px; }
+    .qz-timer-wrap svg { width: 52px; height: 52px; }
+    .qz-timer-num .tnum { font-size: 14px; }
+
+    .qz-q-card { padding: 1.25rem; border-radius: 14px; }
+    .qz-q-text { font-size: 15px; }
+
+    .qz-option { padding: 0.75rem 1rem; gap: 10px; }
+    .qz-opt-letter { width: 28px; height: 28px; font-size: 12px; }
+    .qz-opt-text { font-size: 13px; }
+
+    .qz-map-dot { width: 26px; height: 26px; font-size: 10px; }
+
+    .qz-bottom-row { flex-direction: column; gap: 10px; }
+    .qz-bottom-row > div { width: 100%; display: flex; }
+    .qz-skip-btn { flex: 1; }
+    .qz-next-btn, .qz-finish-btn { width: 100%; justify-content: center; }
+
+    .qz-feedback { padding: 0.75rem 1rem; }
+  }
+
+  @media (max-width: 480px) {
+    .qz-nav { padding: 0 0.75rem; height: 46px; }
+    .qz-nav-right { gap: 6px; }
+    .qz-theme-btn { width: 30px; height: 30px; }
+    .qz-quit-btn { font-size: 11px; padding: 4px 10px; }
+    .qz-main { padding: 0.75rem 0.75rem 2rem; }
+
+    .qz-stats-row { gap: 4px; margin-bottom: 1rem; }
+    .qz-stat-chip { padding: 6px 4px; border-radius: 10px; }
+    .qz-stat-chip .sv { font-size: 14px; }
+
+    .qz-q-num { font-size: 20px; }
+    .qz-q-card { padding: 1rem; }
+    .qz-q-text { font-size: 14px; }
+    .qz-option { padding: 0.65rem 0.85rem; border-radius: 12px; }
+    .qz-opt-letter { width: 26px; height: 26px; font-size: 11px; border-radius: 8px; }
+
+    .qz-map { padding: 1rem; }
+    .qz-map-dot { width: 24px; height: 24px; font-size: 9px; border-radius: 6px; }
+
+    .qz-skip-btn { padding: 10px 14px; font-size: 13px; }
+    .qz-next-btn { padding: 10px 20px; font-size: 13px; }
+    .qz-finish-btn { padding: 10px 20px; font-size: 13px; }
+    .qz-bookmark-btn { padding: 10px; }
+  }
 `;
 
 const LETTERS = ["A", "B", "C", "D"];
@@ -200,6 +404,8 @@ export default function Quiz() {
   const [answered, setAnswered] = useState({});
   const [skipped, setSkipped] = useState({});
   const [bookmarked, setBookmarked] = useState({});
+  const [bookmarkNotes, setBookmarkNotes] = useState({});
+  const [showBookmarkModal, setShowBookmarkModal] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [timeLeft, setTimeLeft] = useState(timePerQuestion);
@@ -390,7 +596,39 @@ export default function Quiz() {
   };
 
   const handleBookmark = () => {
-    setBookmarked((prev) => ({ ...prev, [currentIdx]: !prev[currentIdx] }));
+    if (bookmarked[currentIdx]) {
+      // Already bookmarked — remove it
+      setBookmarked((prev) => ({ ...prev, [currentIdx]: false }));
+      // Also remove from backend
+      const qId = `quiz_${Date.now()}_${currentIdx}`;
+      axiosInstance.delete(`/api/quiz/bookmark/${encodeURIComponent(currentQ?.question)}`).catch(() => {});
+    } else {
+      // Open the bookmark popup
+      setShowBookmarkModal(true);
+    }
+  };
+
+  const handleBookmarkSave = async (note) => {
+    const questionText = currentQ?.question || '';
+    const questionId = questionText; // use question text as ID for uniqueness
+    try {
+      await axiosInstance.post('/api/quiz/bookmark', {
+        questionId,
+        subject: currentQ?.subject || (Array.isArray(subject) ? subject[0] : subject),
+        topic: currentQ?.topic || '',
+        questionText,
+        notes: note,
+      });
+    } catch (err) {
+      // If already bookmarked (409/400), update the note instead
+      if (err.response?.status === 400) {
+        await axiosInstance.patch(`/api/quiz/bookmark/${encodeURIComponent(questionId)}`, { notes: note });
+      } else {
+        throw err;
+      }
+    }
+    setBookmarked((prev) => ({ ...prev, [currentIdx]: true }));
+    setBookmarkNotes((prev) => ({ ...prev, [currentIdx]: note }));
   };
 
   /* ════════════ SUBMIT QUIZ ════════════ */
@@ -727,13 +965,22 @@ export default function Quiz() {
             </div>
           )}
 
+          {/* BOOKMARK MODAL */}
+          <BookmarkModal
+            isOpen={showBookmarkModal}
+            onClose={() => setShowBookmarkModal(false)}
+            question={currentQ?.question}
+            onSave={handleBookmarkSave}
+            existingNote={bookmarkNotes[currentIdx] || ''}
+          />
+
           {/* BOTTOM ROW */}
           <div className="qz-bottom-row">
             <div style={{ display: "flex", gap: 8 }}>
               <button
                 className={`qz-bookmark-btn${bookmarked[currentIdx] ? " saved" : ""}`}
                 onClick={handleBookmark}
-                title="Bookmark this question"
+                title={bookmarked[currentIdx] ? "Remove bookmark" : "Bookmark this question"}
               >
                 🔖
               </button>

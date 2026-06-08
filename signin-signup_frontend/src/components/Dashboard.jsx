@@ -185,6 +185,92 @@ const css = `
   .bb-sidebar-menu div { cursor: pointer; transition: color 0.2s; }
   .bb-sidebar-menu div:hover { color: var(--bb-accent2); }
   .bb-sidebar-menu .logout:hover { color: var(--bb-accent3); }
+
+  /* ── Light mode fixes ── */
+  [data-theme="light"] .bb-btn-ghost { background: rgba(0,0,0,0.04); }
+  [data-theme="light"] .bb-btn-ghost:hover { background: rgba(0,0,0,0.08); }
+  [data-theme="light"] .bb-hero::before { background: radial-gradient(circle, rgba(124,92,252,0.08) 0%, transparent 70%); }
+  [data-theme="light"] .bb-hero::after { background: radial-gradient(circle, rgba(0,229,192,0.06) 0%, transparent 70%); }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .bb-nav { padding: 0.75rem 1rem; }
+    .bb-nav-links { display: none; }
+    .bb-logo { font-size: 18px; }
+    .bb-logo-icon { width: 28px; height: 28px; }
+    .bb-main { padding: 1.25rem 1rem 3rem; }
+
+    .bb-hero { flex-direction: column; gap: 1.25rem; padding: 1.5rem; text-align: center; }
+    .bb-hero-text { order: 2; }
+    .bb-hero-text h1 { font-size: 22px; }
+    .bb-hero-text p { margin-left: auto; margin-right: auto; font-size: 14px; }
+    .bb-hero-stats { justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+    .bb-hero-stat span { font-size: 18px; }
+    .bb-hero-visual { order: 1; }
+    .bb-brain-orb { width: 90px; height: 90px; }
+    .bb-brain-inner { font-size: 36px; }
+    .bb-level-badge { margin-bottom: 0.5rem; }
+
+    .bb-quick-row { flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
+    .bb-quick-btn { flex: 1 1 calc(50% - 4px); min-width: 0; padding: 10px 8px; }
+    .bb-quick-btn .qb-label { font-size: 11px; }
+
+    .bb-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+    .bb-bottom-grid { grid-template-columns: 1fr; gap: 14px; }
+
+    .bb-section-header { flex-wrap: wrap; gap: 8px; }
+
+    .bb-weak-item { flex-direction: column; align-items: stretch; gap: 8px; }
+    .bb-weak-score { min-width: 100%; text-align: center; }
+
+    .bb-sidebar { width: 85vw; max-width: 320px; }
+    .bb-footer { padding: 1rem; font-size: 11px; }
+  }
+
+  @media (max-width: 480px) {
+    .bb-nav { padding: 0.5rem 0.75rem; }
+    .bb-logo { font-size: 16px; gap: 6px; }
+    .bb-logo-icon { width: 24px; height: 24px; }
+    .bb-streak { font-size: 11px; padding: 4px 8px; }
+    .bb-main { padding: 1rem 0.75rem 2.5rem; }
+
+    .bb-hero { padding: 1.25rem; margin-bottom: 1.25rem; border-radius: 16px; }
+    .bb-hero-text h1 { font-size: 20px; }
+    .bb-hero-text p { font-size: 13px; }
+    .bb-hero-stats { gap: 1rem; }
+    .bb-hero-stat span { font-size: 16px; }
+    .bb-brain-orb { width: 72px; height: 72px; }
+    .bb-brain-inner { font-size: 28px; }
+
+    .bb-quick-row { gap: 6px; }
+    .bb-quick-btn { padding: 8px 6px; border-radius: 10px; }
+    .bb-quick-btn .qb-icon { font-size: 16px; }
+    .bb-quick-btn .qb-label { font-size: 10px; }
+
+    .bb-cards-grid { grid-template-columns: 1fr; gap: 10px; }
+    .bb-subject-card { padding: 1rem; }
+    .bb-subject-card .s-icon { width: 36px; height: 36px; margin-bottom: 8px; }
+    .bb-subject-card h3 { font-size: 14px; }
+
+    .bb-btn { padding: 10px 18px; font-size: 13px; }
+    .bb-section-title { font-size: 14px; }
+
+    .bb-panel { padding: 1rem; border-radius: 14px; }
+    .bb-activity-item { gap: 8px; padding: 8px 0; }
+    .bb-activity-icon { width: 30px; height: 30px; }
+    .bb-activity-info strong { font-size: 12px; }
+    .bb-activity-info span { font-size: 11px; }
+    .bb-activity-score { font-size: 12px; padding: 3px 8px; }
+
+    .bb-lb-item { gap: 6px; }
+    .bb-lb-avatar { width: 28px; height: 28px; font-size: 10px; }
+    .bb-lb-info strong { font-size: 12px; }
+    .bb-lb-pts { font-size: 12px; }
+
+    .bb-sidebar { width: 90vw; }
+    .bb-footer { flex-direction: column; gap: 4px; }
+  }
 `;
 
 /* ─── Subject color/icon config ─── */
@@ -480,9 +566,7 @@ function Dashboard() {
               </div>
               <div
                 className="bb-quick-btn"
-                onClick={() =>
-                  alert("Bookmarks vault is under construction… coming soon!")
-                }
+                onClick={() => navigate("/bookmarks")}
               >
                 <div className="qb-icon" style={{ display: "flex", justifyContent: "center" }}><Bookmark size={20} /></div>
                 <div className="qb-label" style={{ cursor: "pointer" }}>
