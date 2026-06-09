@@ -356,6 +356,9 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("today");
   const [showWeakTopics, setShowWeakTopics] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingData, setOnboardingData] = useState({ contactNumber: "", educationLevel: "" });
+  const [onboardingLoading, setOnboardingLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -373,7 +376,13 @@ function Dashboard() {
         email: parsedUser.email || "",
         streak: parsedUser.streak || 0,
         avatar: parsedUser.avatar || "",
+        contactNumber: parsedUser.contactNumber || "",
+        educationLevel: parsedUser.educationLevel || "",
       });
+      
+      if (parsedUser.contactNumber === "Pending" || parsedUser.educationLevel === "Pending") {
+        setShowOnboarding(true);
+      }
     }
 
     fetchDashboard(token);
@@ -449,6 +458,52 @@ function Dashboard() {
   const fullLeaderboard = [...TOP3, userLbRow].sort(
     (a, b) => parseInt(a.rank) - parseInt(b.rank),
   );
+
+  const handleOnboardingSubmit = async (e) => {
+    e.preventDefault();
+    if (!/^[0-9]{10}$/.test(onboardingData.contactNumber)) {
+      alert("Contact number must be exactly 10 digits");
+      return;
+    }
+    if (!onboardingData.educationLevel) {
+      alert("Please select an education level");
+      return;
+    }
+
+    try {
+      setOnboardingLoading(true);
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(onboardingData)
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Update user state and local storage
+        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+        storedUser.contactNumber = data.profile.contactNumber;
+        storedUser.educationLevel = data.profile.educationLevel;
+        localStorage.setItem("user", JSON.stringify(storedUser));
+        
+        setUser(prev => ({
+          ...prev,
+          contactNumber: data.profile.contactNumber,
+          educationLevel: data.profile.educationLevel
+        }));
+        setShowOnboarding(false);
+      } else {
+        alert(data.message || "Failed to update profile");
+      }
+    } catch (err) {
+      alert("An error occurred. Please try again.");
+    } finally {
+      setOnboardingLoading(false);
+    }
+  };
 
   /* ════════════════════════════════════════════════
      RENDER
@@ -820,12 +875,72 @@ function Dashboard() {
             </div>
           </div>
         </div>
-
-        {/* FOOTER */}
+            {/* FOOTER */}
         <footer className="bb-footer">
           <span className="bb-footer-logo"><img src="/favicon-32.png" alt="" /></span>
           © {new Date().getFullYear()} Gyantra. All rights reserved.
         </footer>
+
+        {/* ── ONBOARDING MODAL ── */}
+        {showOnboarding && (
+          <div className="bb-backdrop" style={{ zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+            <div className="bb-panel" style={{ width: "100%", maxWidth: "400px", position: "relative", zIndex: 101, padding: "2rem" }}>
+              <button 
+                onClick={() => setShowOnboarding(false)}
+                style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", color: "var(--bb-muted)", cursor: "pointer" }}
+              >
+                <X size={20} />
+              </button>
+              <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: "22px", marginBottom: "0.5rem" }}>Complete Your Profile</h2>
+              <p style={{ color: "var(--bb-muted)", fontSize: "14px", marginBottom: "1.5rem" }}>
+                You signed up with Google. Please provide a few more details to fully set up your account.
+              </p>
+              
+              <form onSubmit={handleOnboardingSubmit}>
+                <div style={{ marginBottom: "1.25rem" }}>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "var(--bb-muted)", marginBottom: "0.5rem", textTransform: "uppercase" }}>
+                    Contact Number
+                  </label>
+                  <input 
+                    type="tel"
+                    placeholder="10 digit number"
+                    value={onboardingData.contactNumber}
+                    onChange={(e) => setOnboardingData({...onboardingData, contactNumber: e.target.value})}
+                    style={{ width: "100%", background: "var(--bb-surface2)", border: "1px solid var(--bb-border)", padding: "10px 14px", borderRadius: "8px", color: "var(--bb-text)", fontSize: "14px", fontFamily: "'DM Sans', sans-serif" }}
+                  />
+                </div>
+                
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "var(--bb-muted)", marginBottom: "0.5rem", textTransform: "uppercase" }}>
+                    Education Level
+                  </label>
+                  <select 
+                    value={onboardingData.educationLevel}
+                    onChange={(e) => setOnboardingData({...onboardingData, educationLevel: e.target.value})}
+                    style={{ width: "100%", background: "var(--bb-surface2)", border: "1px solid var(--bb-border)", padding: "10px 14px", borderRadius: "8px", color: "var(--bb-text)", fontSize: "14px", fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    <option value="">Select your education level</option>
+                    <option value="Dropout">Dropout</option>
+                    <option value="High School">High School</option>
+                    <option value="Undergraduate">Undergraduate</option>
+                    <option value="Postgraduate">Postgraduate</option>
+                    <option value="Professional">Professional</option>
+                  </select>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={onboardingLoading}
+                  className="bb-btn bb-btn-primary" 
+                  style={{ width: "100%", justifyContent: "center" }}
+                >
+                  {onboardingLoading ? "Saving..." : "Save Details"}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
       </div>
     </>
   );

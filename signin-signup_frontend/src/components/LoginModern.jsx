@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import axios from "../utils/axiosConfig";
 import { Eye, EyeOff } from "lucide-react";
+import { useGoogleLogin } from "@react-oauth/google";
 
 /* ── Tiny particle canvas for the left panel ── */
 function PanelParticles() {
@@ -102,6 +103,25 @@ function LoginModern() {
       setIsLoading(false);
     }
   };
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setIsLoading(true);
+        const res = await axios.post("/api/auth/google", { token: tokenResponse.access_token });
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data));
+        navigate("/dashboard");
+      } catch (error) {
+        alert(error.response?.data?.message || "Google login failed");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    onError: () => {
+      alert("Google login failed");
+    }
+  });
 
   return (
     <>
@@ -832,7 +852,7 @@ function LoginModern() {
             </button>
 
             {/* Google login */}
-            <button className="gl-btn-google" id="login-google">
+            <button className="gl-btn-google" id="login-google" onClick={() => handleGoogleLogin()}>
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
