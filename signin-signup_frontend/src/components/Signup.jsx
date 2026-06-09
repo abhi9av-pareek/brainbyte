@@ -1083,9 +1083,7 @@ function Signup() {
               </button>
 
               {/* Google signup */}
-              {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-                <GoogleSignupButton setErrors={setErrors} setLoading={setLoading} />
-              )}
+              <GoogleSignupButton setErrors={setErrors} setLoading={setLoading} />
             </form>
 
             {/* Login nudge */}

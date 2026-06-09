@@ -879,9 +879,7 @@ function LoginModern() {
             </button>
 
             {/* Google login */}
-            {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-              <GoogleLoginButton setIsLoading={setIsLoading} />
-            )}
+            <GoogleLoginButton setIsLoading={setIsLoading} />
 
             {/* Sign up nudge */}
             <p className="gl-signup-nudge">
