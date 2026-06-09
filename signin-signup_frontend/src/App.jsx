@@ -10,6 +10,7 @@ import Results from "./components/Results";
 import Analytics from "./components/Analytics";
 import Profile from "./components/Profile";
 import GyantraLanding from "./components/GyantraLanding";
+import GyantraBlog from "./components/GyantraBlog";
 import Bookmarks from "./components/Bookmarks";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           {/* Landing page is the entry point */}
           <Route path="/"          element={<GyantraLanding />} />
           <Route path="/landing"   element={<GyantraLanding />} />
+          <Route path="/blog"      element={<GyantraBlog />} />
           <Route path="/login"     element={<LoginModern />} />
           <Route path="/signup"    element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />

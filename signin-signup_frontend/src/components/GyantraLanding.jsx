@@ -798,6 +798,7 @@ export default function GyantraLanding() {
         <a onClick={() => scrollTo("features")}>Features</a>
         <a onClick={() => scrollTo("how")}>How It Works</a>
         <a onClick={() => scrollTo("stats")}>Stats</a>
+        <a onClick={() => { navigate("/blog"); setMobileMenu(false); }}>Blog</a>
         <a onClick={() => { navigate("/login"); setMobileMenu(false); }}>Log In</a>
         <a onClick={() => { navigate("/signup"); setMobileMenu(false); }} style={{ color: "var(--cyan)" }}>Sign Up Free</a>
         <a onClick={() => setMobileMenu(false)} style={{ fontSize: "0.9rem", color: "var(--text3)" }}>✕ Close</a>
@@ -814,6 +815,7 @@ export default function GyantraLanding() {
           <li><a onClick={() => scrollTo("features")}>Features</a></li>
           <li><a onClick={() => scrollTo("how")}>How It Works</a></li>
           <li><a onClick={() => scrollTo("stats")}>Stats</a></li>
+          <li><a onClick={() => navigate("/blog")}>Blog</a></li>
         </ul>
 
         <div className="g-nav-cta">
