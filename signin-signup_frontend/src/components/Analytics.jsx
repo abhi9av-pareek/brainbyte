@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
+import axiosInstance from "../utils/axiosConfig";
 
 /* ─── CSS Variables support light/dark mode via data-theme ─── */
 const css = `
@@ -772,6 +773,7 @@ export default function Analytics() {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [animated, setAnimated] = useState(false);
+  const [scanAnalytics, setScanAnalytics] = useState(null);
 
 
 
@@ -806,6 +808,21 @@ export default function Analytics() {
     };
     load();
   }, [navigate]);
+
+  /* fetch GyanS scan analytics */
+  useEffect(() => {
+    const loadScan = async () => {
+      try {
+        const res = await axiosInstance.get("/api/scan/analytics");
+        if (res.data.success) {
+          setScanAnalytics(res.data.analytics);
+        }
+      } catch (err) {
+        console.warn("Scan analytics not available:", err.message);
+      }
+    };
+    loadScan();
+  }, []);
 
   /* ── derived analytics ── */
   const totalQuizzes = history.length;
@@ -1267,6 +1284,74 @@ export default function Analytics() {
             </div>
           </div>
         </main>
+
+        {/* ── GYANS SCANNER ANALYTICS ── */}
+        {scanAnalytics && scanAnalytics.totalScans > 0 && (
+          <section style={{ maxWidth: 1100, margin: "0 auto", padding: "0 1.5rem 2rem", position: "relative", zIndex: 1 }}>
+            <div className="an-card an-a4" style={{ borderLeft: "3px solid var(--accent2)" }}>
+              <div className="an-card-title">
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 7V5a2 2 0 012-2h2" />
+                    <path d="M17 3h2a2 2 0 012 2v2" />
+                    <path d="M21 17v2a2 2 0 01-2 2h-2" />
+                    <path d="M7 21H5a2 2 0 01-2-2v-2" />
+                    <path d="M7 8h10" />
+                    <path d="M7 12h10" />
+                    <path d="M7 16h7" />
+                  </svg>
+                  GyanS Scanner Analytics
+                </span>
+                <button
+                  className="an-btn an-btn-primary"
+                  style={{ fontSize: 12, padding: "6px 14px" }}
+                  onClick={() => navigate("/gyans")}
+                >
+                  Open GyanS →
+                </button>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 16 }}>
+                {[
+                  { label: "Total Scans", value: scanAnalytics.totalScans, color: "var(--accent)" },
+                  { label: "Quizzes Done", value: scanAnalytics.completedQuizzes, color: "var(--accent2)" },
+                  { label: "Avg Score", value: `${scanAnalytics.avgScore}%`, color: getColor(scanAnalytics.avgScore) },
+                  { label: "Avg Scan Time", value: `${(scanAnalytics.avgScanTime / 1000).toFixed(1)}s`, color: "var(--amber)" },
+                ].map((stat, i) => (
+                  <div key={i} style={{ textAlign: "center", padding: "12px 8px", background: "var(--surface2)", borderRadius: 12, border: "1px solid var(--border)" }}>
+                    <div style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: stat.color }}>
+                      {stat.value}
+                    </div>
+                    <div style={{ fontSize: 10, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginTop: 4 }}>
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {scanAnalytics.subjectBreakdown.length > 0 && (
+                <div>
+                  <div className="an-card-label" style={{ marginBottom: 8 }}>Subject Breakdown</div>
+                  {scanAnalytics.subjectBreakdown.slice(0, 5).map((subj, i) => (
+                    <div key={i} className="an-subj-row">
+                      <div className="an-subj-icon" style={{ background: `${COLORS[i % COLORS.length]}18` }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={COLORS[i % COLORS.length]} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                      </div>
+                      <div className="an-subj-name">{subj.subject}</div>
+                      <div className="an-subj-bar-wrap">
+                        <div className="an-subj-bar-track">
+                          <div className="an-subj-bar-fill" style={{ width: `${subj.accuracy}%`, background: COLORS[i % COLORS.length] }} />
+                        </div>
+                      </div>
+                      <div className="an-subj-pct" style={{ color: COLORS[i % COLORS.length] }}>{subj.accuracy}%</div>
+                      <div className="an-subj-count">{subj.scansCount} scans</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* FLOATING QUOTES */}
         <FloatingQuotes />

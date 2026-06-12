@@ -12,6 +12,7 @@ import Profile from "./components/Profile";
 import GyantraLanding from "./components/GyantraLanding";
 import GyantraBlog from "./components/GyantraBlog";
 import Bookmarks from "./components/Bookmarks";
+import GyanS from "./components/GyanS";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/profile"   element={<Profile />} />
           <Route path="/bookmarks" element={<Bookmarks />} />
+          <Route path="/gyans"      element={<GyanS />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

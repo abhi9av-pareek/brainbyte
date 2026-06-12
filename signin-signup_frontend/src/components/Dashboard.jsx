@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
-import { Sigma, Atom, FlaskConical, Leaf, Monitor, PenLine, BookOpen, Shuffle, Target, Bookmark, Users, Flame, X, Brain } from "lucide-react";
+import { Sigma, Atom, FlaskConical, Leaf, Monitor, PenLine, BookOpen, ScanLine, Target, Bookmark, Users, Flame, X, Brain } from "lucide-react";
 import { AvatarRender } from "./Profile";
 
 /* ─── CSS ─── */
@@ -360,33 +360,6 @@ function Dashboard() {
   const [onboardingData, setOnboardingData] = useState({ contactNumber: "", educationLevel: "" });
   const [onboardingLoading, setOnboardingLoading] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
-
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser({
-        name: parsedUser.name || "User",
-        email: parsedUser.email || "",
-        streak: parsedUser.streak || 0,
-        avatar: parsedUser.avatar || "",
-        contactNumber: parsedUser.contactNumber || "",
-        educationLevel: parsedUser.educationLevel || "",
-      });
-      
-      if (parsedUser.contactNumber === "Pending" || parsedUser.educationLevel === "Pending") {
-        setShowOnboarding(true);
-      }
-    }
-
-    fetchDashboard(token);
-  }, [navigate]);
   const fetchDashboard = async (token) => {
     try {
       const res = await fetch(
@@ -415,15 +388,42 @@ function Dashboard() {
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser({
+        name: parsedUser.name || "User",
+        email: parsedUser.email || "",
+        streak: parsedUser.streak || 0,
+        avatar: parsedUser.avatar || "",
+        contactNumber: parsedUser.contactNumber || "",
+        educationLevel: parsedUser.educationLevel || "",
+      });
+      
+      if (parsedUser.contactNumber === "Pending" || parsedUser.educationLevel === "Pending") {
+        setShowOnboarding(true);
+      }
+    }
+
+    fetchDashboard(token);
+  }, [navigate]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
   };
 
-  const handleRandomQuiz = () => {
-    const subject = dashboard?.randomQuizSubject || "Mathematics";
-    navigate("/QuizSetup", { state: { prefilledSubject: subject } });
+  const handleGyanS = () => {
+    navigate("/gyans");
   };
 
   /* ── derived data ── */
@@ -608,9 +608,9 @@ function Dashboard() {
 
             {/* ── QUICK ACTIONS ── */}
             <div className="bb-quick-row">
-              <div className="bb-quick-btn" onClick={handleRandomQuiz}>
-                <div className="qb-icon" style={{ display: "flex", justifyContent: "center" }}><Shuffle size={20} /></div>
-                <div className="qb-label">Random Quiz</div>
+              <div className="bb-quick-btn" onClick={handleGyanS}>
+                <div className="qb-icon" style={{ display: "flex", justifyContent: "center" }}><ScanLine size={20} /></div>
+                <div className="qb-label">GyanS</div>
               </div>
               <div
                 className="bb-quick-btn"
@@ -861,6 +861,10 @@ function Dashboard() {
           <div className="bb-sidebar-menu">
             <div className="profile" onClick={() => navigate("/profile")}>
               My Profile
+            </div>
+
+            <div onClick={handleGyanS}>
+              GyanS Scanner
             </div>
 
             <div onClick={() => alert("Progress tracking is on the way")}>

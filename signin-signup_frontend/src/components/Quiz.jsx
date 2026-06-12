@@ -396,6 +396,9 @@ export default function Quiz() {
     questions: questionCount = 10,
     timePerQ: timePerQuestion = 30,
     options: quizOptions = {},
+    preGeneratedQuestions = null,
+    scanId = null,
+    isScannedQuiz = false,
   } = config;
 
   const [loadingState, setLoadingState] = useState("loading");
@@ -440,6 +443,19 @@ export default function Quiz() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
+        // ── GyanS: use pre-generated questions if provided ──
+        if (preGeneratedQuestions && preGeneratedQuestions.length > 0) {
+          console.log(`GyanS: Using ${preGeneratedQuestions.length} pre-generated questions`);
+          let qs = preGeneratedQuestions;
+          if (quizOptions.shuffle) {
+            qs = [...qs].sort(() => Math.random() - 0.5);
+          }
+          setQuestions(qs);
+          setLoadingState("ready");
+          totalStartRef.current = Date.now();
+          return;
+        }
+
         //  Guard: verify token exists and looks like a JWT before requesting
         const token = getToken();
         if (!token || token === "undefined" || token === "null") {
@@ -561,12 +577,11 @@ export default function Quiz() {
       },
     }));
 
-    if (quizOptions.instantFeedback !== false) {
+    const showInstant = quizOptions?.instant === true || quizOptions?.instantFeedback === true;
+    if (showInstant) {
       setFeedback({ correct, explanation: currentQ.explanation });
-    } else if (correct) {
-      setFeedback({ correct: true, explanation: currentQ.explanation });
     } else {
-      setFeedback({ correct: false, explanation: currentQ.explanation });
+      setFeedback(null);
     }
   };
 
@@ -665,6 +680,24 @@ export default function Quiz() {
 
       const data = res.data;
 
+      // ── GyanS: Update scan record with quiz results ──
+      if (isScannedQuiz && scanId) {
+        try {
+          await axiosInstance.patch(`/api/scan/${scanId}/complete`, {
+            quizId: data.result?.quizId,
+            score: data.result?.scorePercent || 0,
+            totalCorrect: data.result?.totalCorrect || 0,
+            totalWrong: data.result?.totalWrong || 0,
+            totalSkipped: data.result?.totalSkipped || 0,
+            timeTaken: totalTimeTaken,
+          });
+          console.log("GyanS: Scan record updated with quiz results");
+        } catch (scanErr) {
+          console.warn("Failed to update scan record:", scanErr);
+          // Don't block navigation — quiz results are already saved
+        }
+      }
+
       navigate("/results", {
         state: {
           result: data.result,
@@ -692,8 +725,14 @@ export default function Quiz() {
   const getOptionClass = (optIdx) => {
     const ans = answered[currentIdx];
     if (!ans) return "";
-    if (optIdx === currentQ.answer) return "correct";
-    if (optIdx === ans.chosen) return "wrong";
+
+    const showInstant = quizOptions?.instant === true || quizOptions?.instantFeedback === true;
+    if (showInstant) {
+      if (optIdx === currentQ.answer) return "correct";
+      if (optIdx === ans.chosen) return "wrong";
+    } else {
+      if (optIdx === ans.chosen) return "selected";
+    }
     return "";
   };
 

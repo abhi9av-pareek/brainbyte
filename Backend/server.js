@@ -6,6 +6,7 @@ import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/authRoutes.js";
 import quizRoutes from "./src/routes/quizRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
+import scanRoutes from "./src/routes/scanRoutes.js";
 
 dotenv.config();
 
@@ -46,13 +47,14 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
 // routes
 app.use("/api/quiz", quizRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/scan", scanRoutes);
 
 // root route
 app.get("/", (req, res) => {
