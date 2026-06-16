@@ -462,7 +462,7 @@ export default function Results() {
       <div className="rs-root">
         {/* NAV */}
         <nav className="rs-nav">
-          <div className="rs-logo">
+          <div className="rs-logo" onClick={() => navigate("/dashboard")} style={{ cursor: "pointer" }}>
             <div className="rs-logo-icon"><img src="/favicon-32.png" alt="Gyantra" /></div>
             Gyan<span>tra</span>
           </div>
@@ -660,7 +660,6 @@ export default function Results() {
                     : isSkipped
                       ? "skipped-q"
                       : "wrong-q";
-                  const statusIcon = q.isCorrect ? "✓" : isSkipped ? "−" : "✗";
                   const statusBadge = q.isCorrect
                     ? "qs-correct"
                     : isSkipped
@@ -675,7 +674,13 @@ export default function Results() {
                         onClick={() => setExpandedQ(isOpen ? null : i)}
                       >
                         <div className={`rs-q-status ${statusBadge}`}>
-                          {statusIcon}
+                          {q.isCorrect ? (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          ) : isSkipped ? (
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                          ) : (
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          )}
                         </div>
                         <div className="rs-q-text">{q.questionText}</div>
                         <div className={`rs-q-chevron${isOpen ? " open" : ""}`}>
@@ -706,13 +711,13 @@ export default function Results() {
                                   </span>
                                   <span>{opt}</span>
                                   {isCorrectOpt && (
-                                    <span style={{ marginLeft: "auto" }}>
-                                      ✓
+                                    <span style={{ marginLeft: "auto", display: "inline-flex" }}>
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                     </span>
                                   )}
                                   {isUserOpt && !q.isCorrect && (
-                                    <span style={{ marginLeft: "auto" }}>
-                                      ✗
+                                    <span style={{ marginLeft: "auto", display: "inline-flex" }}>
+                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                     </span>
                                   )}
                                 </div>
@@ -791,7 +796,7 @@ export default function Results() {
         </main>
 
         <footer className="rs-footer">
-          <img src="/favicon-32.png" alt="" />
+          <img src="/favicon-32.png" alt="" onClick={() => navigate("/dashboard")} style={{ cursor: "pointer" }} />
           © {new Date().getFullYear()} Gyantra. All rights reserved.
         </footer>
       </div>

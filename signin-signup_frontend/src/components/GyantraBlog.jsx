@@ -430,7 +430,13 @@ export default function GyantraBlog() {
             <button className="blog-back-btn" onClick={() => navigate("/")}>
               <ArrowLeft size={14} /> Home
             </button>
-            <div className="blog-logo" onClick={() => navigate("/")}>
+            <div className="blog-logo" onClick={() => {
+              if (localStorage.getItem("token")) {
+                navigate("/dashboard");
+              } else {
+                navigate("/");
+              }
+            }}>
               <div className="blog-logo-img"><img src="/favicon-32.png" alt="Gyantra" /></div>
               <span className="blog-logo-text">GY<span>AN</span>TRA</span>
             </div>
@@ -617,11 +623,27 @@ export default function GyantraBlog() {
 
         {/* ── FOOTER ── */}
         <footer className="blog-footer">
-          <div className="blog-footer-logo">
+          <div className="blog-footer-logo" onClick={() => {
+            if (localStorage.getItem("token")) {
+              navigate("/dashboard");
+            } else {
+              navigate("/");
+            }
+          }} style={{ cursor: "pointer" }}>
             <div className="blog-footer-logo-img"><img src="/favicon-32.png" alt="" /></div>
             <span className="blog-footer-logo-text">GY<span>AN</span>TRA</span>
           </div>
-          <div>© {new Date().getFullYear()} Gyantra. All rights reserved. Built for India's exam warriors. 🇮🇳</div>
+          <div>
+            © {new Date().getFullYear()} Gyantra. All rights reserved. Built for India's exam warriors.
+            <svg width="16" height="12" viewBox="0 0 3 2" style={{ display: "inline-block", marginLeft: "8px", verticalAlign: "middle", borderRadius: "2px", boxShadow: "0 0 1px rgba(0,0,0,0.2)" }}>
+              <rect width="3" height="0.667" fill="#FF9933" />
+              <rect y="0.667" width="3" height="0.667" fill="#FFFFFF" />
+              <rect y="1.333" width="3" height="0.667" fill="#138808" />
+              <circle cx="1.5" cy="1" r="0.2" fill="#000080" />
+              <circle cx="1.5" cy="1" r="0.15" fill="none" stroke="#FFFFFF" strokeWidth="0.02" />
+              <path d="M 1.5 0.8 L 1.5 1.2 M 1.3 1 L 1.7 1 M 1.36 0.86 L 1.64 1.14 M 1.36 1.14 L 1.64 0.86" stroke="#000080" strokeWidth="0.02" />
+            </svg>
+          </div>
         </footer>
       </div>
     </>

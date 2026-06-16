@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../utils/axiosConfig";
-import { Bot, Gamepad2, Brain, Code2, Zap, Rocket, Target, Microscope, Globe, Orbit, CircuitBoard, Dna, Atom, Telescope, Trophy, Bird, Flame, Waves, Gem, Cat, Dog, Skull, Moon, Compass } from "lucide-react";
+import { Bot, Gamepad2, Brain, Code2, Zap, Rocket, Target, Microscope, Globe, Orbit, CircuitBoard, Dna, Atom, Telescope, Trophy, Bird, Flame, Waves, Gem, Cat, Dog, Skull, Moon, Compass, Sparkles } from "lucide-react";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    AVATAR RENDERER  (exported so Dashboard/navbar can reuse it)
@@ -115,6 +115,16 @@ const IconShield = ({ size = 14 }) => (
 const IconCheck = ({ size = 14 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+const IconLock = ({ size = 14, style = {} }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0110 0v4" />
+  </svg>
+);
+const IconAlert = ({ size = 14, style = {} }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
   </svg>
 );
 const IconUpload = ({ size = 20 }) => (
@@ -320,6 +330,10 @@ const css = `
   .pf-diff-btn { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border2); background: var(--surface2); color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .18s; font-family: 'DM Sans', sans-serif; }
   .pf-diff-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 3px 12px rgba(124,92,252,0.3); }
   .pf-diff-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .pf-diff-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .pf-diff-dot.easy { background: var(--accent2, #00E5C0); }
+  .pf-diff-dot.medium { background: var(--amber, #FFB347); }
+  .pf-diff-dot.hard { background: var(--accent3, #FF6B6B); }
 
   /* ALERT BANNER */
   .pf-alert { padding: 12px 16px; border-radius: 10px; font-size: 12.5px; font-weight: 500; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 1rem; }
@@ -503,7 +517,7 @@ export default function Profile() {
         const stored = JSON.parse(localStorage.getItem("user") || "{}");
         localStorage.setItem("user", JSON.stringify({ ...stored, ...data.profile }));
         setHasChange(false);
-        showToast("✓ Profile saved to cloud!");
+        showToast("Profile saved to cloud!");
       } else {
         showToast(data.message || "Save failed", true);
       }
@@ -564,7 +578,7 @@ export default function Profile() {
       if (data.success) {
         setPwdSuccess("Password changed successfully!");
         setPwd({ current: "", newPwd: "", confirm: "" });
-        showToast("✓ Password updated!");
+        showToast("Password updated!");
       } else {
         setPwdError(data.message || "Failed to change password");
       }
@@ -742,7 +756,7 @@ export default function Profile() {
                     />
                     {profile.nickname && (
                       <div className="pf-badge-preview">
-                        {profile.avatar && !profile.avatar.startsWith("data:") ? profile.avatar : "✨"}
+                         {profile.avatar && !profile.avatar.startsWith("data:") ? profile.avatar : <Sparkles size={14} color="var(--accent2)" style={{ display: "inline-block", verticalAlign: "middle" }} />}
                         &nbsp; Hey, {profile.nickname}!
                       </div>
                     )}
@@ -839,7 +853,7 @@ export default function Profile() {
                       className={`pf-diff-btn${prefs.defaultDifficulty === d ? " active" : ""}`}
                       onClick={() => setPref("defaultDifficulty")(d)}
                     >
-                      {d === "Easy" ? "🟢" : d === "Medium" ? "🟡" : "🔴"} {d}
+                      <span className={`pf-diff-dot ${d.toLowerCase()}`} /> {d}
                     </button>
                   ))}
                 </div>
@@ -947,7 +961,12 @@ export default function Profile() {
                         {pwdStrength.cls === "weak" && " — add uppercase, numbers, symbols"}
                         {pwdStrength.cls === "fair" && " — almost there!"}
                         {pwdStrength.cls === "good" && " — looking solid"}
-                        {pwdStrength.cls === "strong" && " — excellent! 🔒"}
+                        {pwdStrength.cls === "strong" && (
+                          <>
+                            {" — excellent! "}
+                            <IconLock size={12} style={{ display: "inline-block", verticalAlign: "middle" }} />
+                          </>
+                        )}
                       </div>
                     </>
                   )}
@@ -1012,7 +1031,7 @@ export default function Profile() {
               {/* DANGER ZONE */}
               <div className="pf-card">
                 <div className="pf-card-title" style={{ color: "var(--accent3)" }}>
-                  ⚠️ Danger Zone
+                   <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><IconAlert size={15} /> Danger Zone</span>
                 </div>
                 <div className="pf-danger-zone">
                   <div className="pf-danger-title">Delete Account</div>
@@ -1036,7 +1055,7 @@ export default function Profile() {
         {activeTab !== "security" && (
           <div className="pf-save-bar">
             <div className={`pf-save-status${hasChange ? " changed" : ""}`}>
-              {hasChange ? "⚠ Unsaved changes" : <><IconCheck size={12} /> All changes saved to cloud</>}
+              {hasChange ? <><IconAlert size={13} style={{ display: "inline-block", verticalAlign: "middle" }} /> Unsaved changes</> : <><IconCheck size={12} /> All changes saved to cloud</>}
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <button className="pf-btn pf-btn-ghost" onClick={handleCancel} disabled={!hasChange || saving}>

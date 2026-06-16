@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import axiosInstance from "../utils/axiosConfig"; // use axios so interceptor attaches token
+import { Bookmark, X, AlertTriangle, Check, Zap } from "lucide-react";
 
 /* ─── Bookmark Popup Modal Component ─── */
 function BookmarkModal({ isOpen, onClose, question, onSave, existingNote }) {
@@ -58,17 +59,17 @@ function BookmarkModal({ isOpen, onClose, question, onSave, existingNote }) {
       <div className={`bkm-popup ${saved ? 'bkm-popup-saved' : ''}`}>
         {saved ? (
           <div className="bkm-saved-state">
-            <div className="bkm-saved-icon">✓</div>
+            <div className="bkm-saved-icon"><Check size={18} /></div>
             <div className="bkm-saved-text">Bookmarked!</div>
           </div>
         ) : (
           <>
             <div className="bkm-header">
               <div className="bkm-header-left">
-                <span className="bkm-emoji">🔖</span>
+                <span className="bkm-emoji" style={{ display: "inline-flex", alignItems: "center" }}><Bookmark size={16} /></span>
                 <span className="bkm-title">Bookmark Question</span>
               </div>
-              <button className="bkm-close" onClick={onClose}>✕</button>
+              <button className="bkm-close" onClick={onClose}><X size={14} /></button>
             </div>
             <div className="bkm-question-preview">
               <div className="bkm-q-label">QUESTION</div>
@@ -90,7 +91,7 @@ function BookmarkModal({ isOpen, onClose, question, onSave, existingNote }) {
                 Save without note
               </button>
               <button className="bkm-save-btn" onClick={handleSave} disabled={saving}>
-                {saving ? 'Saving...' : '🔖 Save with Note'}
+                {saving ? 'Saving...' : <><Bookmark size={14} style={{ display: "inline-block", marginRight: 6, verticalAlign: "middle" }} /> Save with Note</>}
               </button>
             </div>
           </>
@@ -765,7 +766,7 @@ export default function Quiz() {
         <style>{css}</style>
         <div className="qz-root">
           <div className="qz-center">
-            <div style={{ fontSize: 36 }}>⚠️</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}><AlertTriangle size={40} color="var(--accent3)" /></div>
             <div className="qz-loading-title">Failed to generate questions</div>
             <div className="qz-loading-sub">
               Check your internet connection or try a different subject.
@@ -804,7 +805,7 @@ export default function Quiz() {
       <div className="qz-root">
         {/* ── NAV ── */}
         <nav className="qz-nav">
-          <div className="qz-logo">
+          <div className="qz-logo" onClick={() => { if (window.confirm("Quit quiz? Your progress will be lost.")) { navigate("/dashboard"); } }} style={{ cursor: "pointer" }}>
             <div className="qz-logo-icon"><img src="/favicon-32.png" alt="Gyantra" /></div>
             Gyan<span>tra</span>
           </div>
@@ -922,7 +923,7 @@ export default function Quiz() {
                           : timerColor,
                     }}
                   >
-                    {currentAnswered || currentSkipped ? "✓" : timeLeft}
+                    {currentAnswered || currentSkipped ? <Check size={16} /> : timeLeft}
                   </div>
                   <div className="tlabel">
                     {currentAnswered || currentSkipped ? "" : "sec"}
@@ -979,10 +980,10 @@ export default function Quiz() {
                   <div className="qz-opt-letter">{LETTERS[i]}</div>
                   <div className="qz-opt-text">{opt}</div>
                   {stateCls === "correct" && (
-                    <span style={{ marginLeft: "auto", fontSize: 16 }}>✓</span>
+                    <span style={{ marginLeft: "auto", display: "inline-flex" }}><Check size={16} color="var(--accent2)" /></span>
                   )}
                   {stateCls === "wrong" && (
-                    <span style={{ marginLeft: "auto", fontSize: 16 }}>✗</span>
+                    <span style={{ marginLeft: "auto", display: "inline-flex" }}><X size={16} color="var(--accent3)" /></span>
                   )}
                 </div>
               );
@@ -994,7 +995,7 @@ export default function Quiz() {
             <div
               className={`qz-feedback ${feedback.correct ? "correct-fb" : "wrong-fb"}`}
             >
-              <div className="qz-fb-icon">{feedback.correct ? "✓" : "✗"}</div>
+              <div className="qz-fb-icon">{feedback.correct ? <Check size={16} /> : <X size={16} />}</div>
               <div>
                 <div className="qz-fb-title">
                   {feedback.correct ? "Correct! Well done." : "Incorrect!"}
@@ -1021,7 +1022,7 @@ export default function Quiz() {
                 onClick={handleBookmark}
                 title={bookmarked[currentIdx] ? "Remove bookmark" : "Bookmark this question"}
               >
-                🔖
+                <Bookmark size={15} style={{ verticalAlign: "middle" }} />
               </button>
               <button
                 className="qz-skip-btn"
@@ -1034,7 +1035,7 @@ export default function Quiz() {
 
             {isLastQuestion || allDone ? (
               <button className="qz-finish-btn" onClick={handleFinish}>
-                ⚡ Finish Quiz
+                <Zap size={14} style={{ display: "inline-block", marginRight: 6, verticalAlign: "middle" }} /> Finish Quiz
               </button>
             ) : (
               <button

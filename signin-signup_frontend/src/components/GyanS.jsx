@@ -1,9 +1,9 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import axiosInstance from "../utils/axiosConfig";
-import { ScanLine, Upload, Image, Trash2, Edit3, Check, X, Clock, Target, Award, ChevronRight, Brain, Flame, ArrowLeft, History, Camera, FileText } from "lucide-react";
+import { ScanLine, Upload, Image, Trash2, Edit3, Check, X, Clock, Target, Award, ChevronRight, Brain, Flame, ArrowLeft, History, Camera, FileText, AlertTriangle } from "lucide-react";
 
 // Set up PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -159,8 +159,21 @@ const css = `
   .gs-history-empty { text-align: center; padding: 3rem; color: var(--muted); }
   .gs-history-empty .gs-empty-icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(124,92,252,0.08); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--muted2); }
   .gs-history-list { display: flex; flex-direction: column; gap: 10px; }
-  .gs-history-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all .25s; }
-  .gs-history-card:hover { border-color: var(--border2); transform: translateY(-2px); background: var(--surface2); }
+  .gs-history-card { background: rgba(17,19,24,0.7); border: 1px solid var(--border); border-radius: 16px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all .25s; backdrop-filter: blur(8px); }
+  [data-theme="light"] .gs-history-card { background: rgba(255,255,255,0.7); }
+  .gs-history-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(124,92,252,0.15); }
+
+  /* FEATURES GRID */
+  .gs-features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 2.5rem; }
+  .gs-feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; text-align: left; transition: all 0.2s; position: relative; overflow: hidden; }
+  .gs-feature-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(124,92,252,0.05) 0%, transparent 60%); pointer-events: none; }
+  .gs-feature-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+  .gs-feature-icon-wrapper { width: 40px; height: 40px; border-radius: 10px; background: rgba(124,92,252,0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .gs-feature-card h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .gs-feature-card p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  @media (max-width: 768px) {
+    .gs-features-grid { grid-template-columns: 1fr; gap: 12px; margin-top: 1.5rem; }
+  }
   .gs-history-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .gs-history-icon.scanned { background: rgba(124,92,252,0.12); color: var(--accent); }
   .gs-history-icon.completed { background: rgba(0,229,192,0.12); color: var(--accent2); }
@@ -258,6 +271,28 @@ export default function GyanS() {
   const [pdfFile, setPdfFile] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [scanProgressText, setScanProgressText] = useState("");
+
+  // Dynamic Scanner logs for Image scanning path
+  useEffect(() => {
+    if (!scanning || pdfFile) return;
+    const logs = [
+      "Initializing GyanS OCR Engine...",
+      "Optimizing image layers for layout scanning...",
+      "Detecting columns and text coordinates...",
+      "Synthesizing questions with NVIDIA DeepSeek AI...",
+      "Generating explanations and difficulty ratings...",
+      "Finalizing MCQ structure..."
+    ];
+    let currentLogIdx = 0;
+    setScanProgressText(logs[0]);
+    const interval = setInterval(() => {
+      currentLogIdx++;
+      if (currentLogIdx < logs.length) {
+        setScanProgressText(logs[currentLogIdx]);
+      }
+    }, 2200);
+    return () => clearInterval(interval);
+  }, [scanning, pdfFile]);
   const [scanError, setScanError] = useState(null);
   const [extractedQuestions, setExtractedQuestions] = useState([]);
   const [scanMeta, setScanMeta] = useState(null);
@@ -699,7 +734,7 @@ export default function GyanS() {
             <button className="gs-back-btn" onClick={() => navigate("/dashboard")}>
               <ArrowLeft size={16} />
             </button>
-            <div className="gs-logo">
+            <div className="gs-logo" onClick={() => navigate("/dashboard")} style={{ cursor: "pointer" }}>
               <div className="gs-logo-icon"><img src="/favicon-32.png" alt="Gyantra" /></div>
               Gyan<span>S</span>
             </div>
@@ -835,6 +870,33 @@ export default function GyanS() {
                     )}
                   </div>
 
+                  {/* Features Grid */}
+                  {images.length === 0 && !pdfFile && (
+                    <div className="gs-features-grid">
+                      <div className="gs-feature-card">
+                        <div className="gs-feature-icon-wrapper">
+                          <Brain size={20} className="gs-feature-icon" />
+                        </div>
+                        <h3>Smart AI Extraction</h3>
+                        <p>Extract MCQs from physical papers, worksheets, or textbook snapshots in seconds using NVIDIA AI.</p>
+                      </div>
+                      <div className="gs-feature-card">
+                        <div className="gs-feature-icon-wrapper">
+                          <Clock size={20} className="gs-feature-icon" />
+                        </div>
+                        <h3>Simulated Exam Mode</h3>
+                        <p>Launch custom timed tests directly from your scans to build speed and accuracy under pressure.</p>
+                      </div>
+                      <div className="gs-feature-card">
+                        <div className="gs-feature-icon-wrapper">
+                          <Target size={20} className="gs-feature-icon" />
+                        </div>
+                        <h3>Deep Feedback & Edits</h3>
+                        <p>Verify and edit extracted questions manually. Get detailed AI explanations for all correct answers.</p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Hidden file inputs */}
                   <input
                     ref={fileInputRef}
@@ -892,7 +954,9 @@ export default function GyanS() {
               {/* STATE: Error */}
               {scanError && (
                 <div className="gs-error">
-                  <div className="gs-error-icon">⚠️</div>
+                  <div className="gs-error-icon">
+                    <AlertTriangle size={36} color="var(--accent3)" style={{ margin: "0 auto 12px" }} />
+                  </div>
                   <h3>Extraction Failed</h3>
                   <p>{scanError}</p>
                   <button className="gs-error-btn" onClick={() => { setScanError(null); }}>
@@ -1120,7 +1184,7 @@ export default function GyanS() {
 
         {/* FOOTER */}
         <footer className="gs-footer">
-          <img src="/favicon-32.png" alt="" />
+          <img src="/favicon-32.png" alt="" onClick={() => navigate("/dashboard")} style={{ cursor: "pointer" }} />
           © {new Date().getFullYear()} Gyantra · GyanS Scanner
         </footer>
       </div>

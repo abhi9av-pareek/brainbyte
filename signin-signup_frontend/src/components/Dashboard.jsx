@@ -515,7 +515,7 @@ function Dashboard() {
         {/* NAV */}
         {/* NAV */}
         <nav className="bb-nav">
-          <div className="bb-logo">
+          <div className="bb-logo" onClick={() => navigate("/dashboard")} style={{ cursor: "pointer" }}>
             <div className="bb-logo-icon"><img src="/favicon-32.png" alt="Gyantra" /></div>
             Gyan<span>tra</span>
           </div>
@@ -861,6 +861,10 @@ function Dashboard() {
           <div className="bb-sidebar-menu">
             <div className="profile" onClick={() => navigate("/profile")}>
               My Profile
+            </div>
+
+            <div onClick={() => navigate("/analytics")}>
+              Analytics
             </div>
 
             <div onClick={handleGyanS}>

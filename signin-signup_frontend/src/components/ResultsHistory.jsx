@@ -426,7 +426,7 @@ export default function ResultsHistory() {
         </main>
 
         <footer className="rh-footer">
-          <img src="/favicon-32.png" alt="" />
+          <img src="/favicon-32.png" alt="" onClick={() => navigate("/dashboard")} style={{ cursor: "pointer" }} />
           © {new Date().getFullYear()} Gyantra. All rights reserved.
         </footer>
       </div>

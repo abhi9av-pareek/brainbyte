@@ -253,7 +253,7 @@ export default function Bookmarks() {
         ),
       );
       setEditing(null);
-      showToast("Note saved successfully ✓");
+      showToast("Note saved successfully!");
     } catch (err) {
       console.error("Failed to save note:", err);
       showToast("Failed to save note", "error");
@@ -296,7 +296,7 @@ export default function Bookmarks() {
       <div className="bk-root">
         {/* NAV */}
         <nav className="bk-nav">
-          <div className="bk-logo">
+          <div className="bk-logo" onClick={() => navigate("/dashboard")} style={{ cursor: "pointer" }}>
             <div className="bk-logo-icon">
               <img src="/favicon-32.png" alt="Gyantra" />
             </div>
@@ -326,7 +326,7 @@ export default function Bookmarks() {
             <div className="bk-hero-content">
               <div className="bk-hero-top">
                 <h1>
-                  <span className="bk-hero-emoji">🔖</span>
+                  <Bookmark size={24} style={{ display: "inline-block", marginRight: 8, verticalAlign: "middle", color: "var(--bk-amber)" }} />
                   Your Bookmark Vault
                 </h1>
                 {bookmarks.length > 0 && (
@@ -357,7 +357,7 @@ export default function Bookmarks() {
               </div>
               <h2>No bookmarks yet</h2>
               <p>
-                Start a quiz and tap the 🔖 bookmark button on any tricky question.
+                Start a quiz and tap the bookmark button on any tricky question.
                 Your saved questions will appear here for easy revision.
               </p>
               <button className="bk-empty-btn" onClick={() => navigate("/QuizSetup")}>
