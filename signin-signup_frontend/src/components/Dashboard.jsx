@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
-import { Sigma, Atom, FlaskConical, Leaf, Monitor, PenLine, BookOpen, ScanLine, Target, Bookmark, Users, Flame, X, Brain } from "lucide-react";
+import { Sigma, Atom, FlaskConical, Leaf, Monitor, PenLine, BookOpen, ScanLine, Target, Bookmark, Users, Flame, X, Brain, TrendingDown, ChevronRight, ChevronDown } from "lucide-react";
 import { AvatarRender } from "./Profile";
 
 /* ─── CSS ─── */
@@ -119,17 +119,67 @@ const css = `
   /* EMPTY STATE */
   .bb-empty { text-align: center; padding: 2rem; color: var(--bb-muted); font-size: 13px; }
 
-  /* WEAK TOPICS */
-  .bb-weak-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2rem; }
-  .bb-weak-item { background: var(--bb-surface); border: 1px solid var(--bb-border); border-radius: 14px; padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 12px; }
-  .bb-weak-score { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; min-width: 48px; text-align: center; padding: 6px 0; border-radius: 10px; }
-  .weak-red    { background: rgba(255,107,107,0.12); color: var(--bb-accent3); }
-  .weak-amber  { background: rgba(255,179,71,0.12);  color: var(--bb-amber); }
-  .weak-yellow { background: rgba(255,220,50,0.12);  color: #FFE333; }
-  .bb-weak-info { flex: 1; }
-  .bb-weak-info strong { font-size: 13px; font-weight: 600; display: block; margin-bottom: 2px; }
-  .bb-weak-info .bb-weak-subject { font-size: 11px; color: var(--bb-accent2); margin-bottom: 4px; display: block; }
-  .bb-weak-info .bb-weak-suggestion { font-size: 12px; color: var(--bb-muted); line-height: 1.5; }
+  /* WEAK SUBJECTS — Grouped Accordion */
+  .bb-weak-panel { background: var(--bb-surface); border: 1px solid var(--bb-border2); border-radius: 18px; padding: 1.5rem; margin-bottom: 2rem; animation: bb-weak-slide-in 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes bb-weak-slide-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+  .bb-weak-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+  .bb-weak-header-left { display: flex; align-items: center; gap: 10px; }
+  .bb-weak-header-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,107,107,0.12); display: flex; align-items: center; justify-content: center; color: var(--bb-accent3); }
+  .bb-weak-header h2 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+  .bb-weak-header-sub { font-size: 12px; color: var(--bb-muted); margin-top: 1px; }
+  .bb-weak-close { background: none; border: 1px solid var(--bb-border2); width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--bb-muted); transition: all .2s; }
+  .bb-weak-close:hover { border-color: var(--bb-accent3); color: var(--bb-accent3); }
+
+  /* Subject accordion cards */
+  .bb-weak-subjects { display: flex; flex-direction: column; gap: 10px; }
+  .bb-weak-subj-card { background: var(--bb-surface2); border: 1px solid var(--bb-border); border-radius: 14px; overflow: hidden; transition: all .25s; }
+  .bb-weak-subj-card:hover { border-color: var(--bb-border2); }
+  .bb-weak-subj-card.expanded { border-color: rgba(124,92,252,0.25); box-shadow: 0 4px 20px rgba(124,92,252,0.08); }
+
+  .bb-weak-subj-head { display: flex; align-items: center; gap: 14px; padding: 1rem 1.25rem; cursor: pointer; transition: background .2s; }
+  .bb-weak-subj-head:hover { background: rgba(255,255,255,0.02); }
+  [data-theme="light"] .bb-weak-subj-head:hover { background: rgba(0,0,0,0.02); }
+
+  .bb-weak-subj-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  .bb-weak-score-ring { width: 44px; height: 44px; position: relative; flex-shrink: 0; }
+  .bb-weak-score-ring svg { transform: rotate(-90deg); }
+  .bb-weak-score-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; }
+
+  .bb-weak-subj-info { flex: 1; min-width: 0; }
+  .bb-weak-subj-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .bb-weak-subj-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--bb-muted); }
+  .bb-weak-subj-meta .meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--bb-muted2); }
+
+  .bb-weak-subj-right { display: flex; align-items: center; gap: 10px; }
+  .bb-weak-subj-progress { width: 60px; }
+  .bb-weak-progress-bar { height: 4px; background: var(--bb-muted2); border-radius: 4px; overflow: hidden; }
+  .bb-weak-progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .bb-weak-subj-chevron { color: var(--bb-muted); transition: transform .3s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; }
+  .bb-weak-subj-chevron.open { transform: rotate(180deg); color: var(--bb-accent); }
+
+  /* Expanded topics list inside a subject */
+  .bb-weak-topics-inner { border-top: 1px solid var(--bb-border); padding: 0.75rem 1rem; display: flex; flex-direction: column; gap: 8px; animation: bb-topics-expand 0.3s ease; }
+  @keyframes bb-topics-expand { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 600px; } }
+
+  .bb-weak-topic-row { display: flex; align-items: center; gap: 12px; padding: 0.7rem 0.75rem; background: var(--bb-surface); border: 1px solid var(--bb-border); border-radius: 10px; transition: all .2s; position: relative; }
+  .bb-weak-topic-row:hover { border-color: var(--bb-border2); transform: translateX(2px); }
+  .bb-weak-topic-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: 10px 0 0 10px; }
+  .bb-weak-topic-row.severity-critical::before { background: var(--bb-accent3); }
+  .bb-weak-topic-row.severity-warning::before { background: var(--bb-amber); }
+  .bb-weak-topic-row.severity-mild::before { background: #FFE333; }
+
+  .bb-weak-topic-score { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; min-width: 38px; text-align: center; padding: 4px 8px; border-radius: 8px; flex-shrink: 0; }
+  .bb-weak-topic-score.ts-critical { background: rgba(255,107,107,0.12); color: var(--bb-accent3); }
+  .bb-weak-topic-score.ts-warning { background: rgba(255,179,71,0.12); color: var(--bb-amber); }
+  .bb-weak-topic-score.ts-mild { background: rgba(255,220,50,0.12); color: #FFE333; }
+
+  .bb-weak-topic-info { flex: 1; min-width: 0; }
+  .bb-weak-topic-name { font-size: 13px; font-weight: 600; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bb-weak-topic-hint { font-size: 11px; color: var(--bb-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+
+  .bb-weak-practice-btn { display: flex; align-items: center; gap: 4px; background: rgba(124,92,252,0.1); border: 1px solid rgba(124,92,252,0.2); border-radius: 10px; padding: 6px 12px; color: var(--bb-accent); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s; white-space: nowrap; font-family: 'DM Sans', sans-serif; flex-shrink: 0; }
+  .bb-weak-practice-btn:hover { background: rgba(124,92,252,0.18); border-color: rgba(124,92,252,0.35); transform: translateY(-1px); }
 
   /* BOTTOM GRID */
   .bb-bottom-grid { display: grid; grid-template-columns: 1fr 320px; gap: 14px; }
@@ -221,8 +271,13 @@ const css = `
 
     .bb-section-header { flex-wrap: wrap; gap: 8px; }
 
-    .bb-weak-item { flex-direction: column; align-items: stretch; gap: 8px; }
-    .bb-weak-score { min-width: 100%; text-align: center; }
+    .bb-weak-subj-head { gap: 10px; padding: 0.85rem 1rem; }
+    .bb-weak-subj-icon { width: 34px; height: 34px; }
+    .bb-weak-score-ring { width: 38px; height: 38px; }
+    .bb-weak-score-num { font-size: 11px; }
+    .bb-weak-subj-progress { display: none; }
+    .bb-weak-topic-row { flex-wrap: wrap; gap: 8px; }
+    .bb-weak-practice-btn { width: 100%; justify-content: center; padding: 8px; }
 
     .bb-sidebar { width: 85vw; max-width: 320px; }
     .bb-footer { padding: 1rem; font-size: 11px; }
@@ -328,9 +383,15 @@ const getScoreClass = (percent) => {
 };
 
 const getWeakScoreClass = (avg) => {
-  if (avg < 30) return "weak-red";
-  if (avg < 50) return "weak-amber";
-  return "weak-yellow";
+  if (avg < 30) return "severity-critical";
+  if (avg < 50) return "severity-warning";
+  return "severity-mild";
+};
+
+const getWeakScoreColor = (avg) => {
+  if (avg < 30) return "#FF6B6B";
+  if (avg < 50) return "#FFB347";
+  return "#FFE333";
 };
 
 const formatTimeAgo = (dateStr) => {
@@ -356,6 +417,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("today");
   const [showWeakTopics, setShowWeakTopics] = useState(false);
+  const [expandedSubject, setExpandedSubject] = useState(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingData, setOnboardingData] = useState({ contactNumber: "", educationLevel: "" });
   const [onboardingLoading, setOnboardingLoading] = useState(false);
@@ -434,6 +496,22 @@ function Dashboard() {
   const activityList = activeTab === "today" ? recentToday : recentAll;
   const subjectCards = dashboard?.subjectProgress || [];
   const weakTopics = dashboard?.weakTopics || [];
+
+  /* Group weak topics by subject for accordion view */
+  const weakBySubject = weakTopics.reduce((acc, wt) => {
+    const subj = wt.subject || "General";
+    if (!acc[subj]) acc[subj] = [];
+    acc[subj].push(wt);
+    return acc;
+  }, {});
+  const weakSubjectEntries = Object.entries(weakBySubject)
+    .map(([subject, topics]) => ({
+      subject,
+      topics: topics.sort((a, b) => a.avgScore - b.avgScore),
+      avgScore: Math.round(topics.reduce((s, t) => s + t.avgScore, 0) / topics.length),
+      topicCount: topics.length,
+    }))
+    .sort((a, b) => a.avgScore - b.avgScore);
 
   const xp = dashboard?.xp ?? 0;
   const accuracy = dashboard?.accuracy ?? 0;
@@ -617,7 +695,7 @@ function Dashboard() {
                 onClick={() => setShowWeakTopics((p) => !p)}
               >
                 <div className="qb-icon" style={{ display: "flex", justifyContent: "center" }}><Target size={20} /></div>
-                <div className="qb-label">Weak Topics</div>
+                <div className="qb-label">Weak Subjects</div>
               </div>
               <div
                 className="bb-quick-btn"
@@ -637,45 +715,115 @@ function Dashboard() {
               </div>
             </div>
 
-            {/* ── WEAK TOPICS (toggle panel) ── */}
+            {/* ── WEAK SUBJECTS (grouped accordion) ── */}
             {showWeakTopics && (
-              <div style={{ marginBottom: "2rem" }}>
-                <div className="bb-section-header">
-                  <h2 className="bb-section-title">Weak Topics</h2>
+              <div className="bb-weak-panel">
+                <div className="bb-weak-header">
+                  <div className="bb-weak-header-left">
+                    <div className="bb-weak-header-icon">
+                      <TrendingDown size={18} />
+                    </div>
+                    <div>
+                      <h2>Weak Subjects</h2>
+                      <div className="bb-weak-header-sub">
+                        {weakSubjectEntries.length > 0
+                          ? `${weakSubjectEntries.length} subject${weakSubjectEntries.length > 1 ? "s" : ""} with ${weakTopics.length} weak topic${weakTopics.length > 1 ? "s" : ""}`
+                          : "No weak areas detected yet"}
+                      </div>
+                    </div>
+                  </div>
                   <button
-                    className="bb-see-all"
-                    onClick={() => setShowWeakTopics(false)}
+                    className="bb-weak-close"
+                    onClick={() => { setShowWeakTopics(false); setExpandedSubject(null); }}
                   >
-                    Close
+                    <X size={14} />
                   </button>
                 </div>
-                {weakTopics.length === 0 ? (
+                {weakSubjectEntries.length === 0 ? (
                   <div className="bb-empty">
-                    No weak topics yet — complete a few quizzes and we will
+                    No weak subjects yet — complete a few quizzes and we'll
                     track them here.
                   </div>
                 ) : (
-                  <div className="bb-weak-list">
-                    {[...weakTopics]
-                      .sort((a, b) => a.avgScore - b.avgScore)
-                      .map((wt, i) => (
-                        <div key={i} className="bb-weak-item">
+                  <div className="bb-weak-subjects">
+                    {weakSubjectEntries.map((entry) => {
+                      const cfg = SUBJECT_CONFIG[entry.subject] || DEFAULT_CONFIG;
+                      const isOpen = expandedSubject === entry.subject;
+                      const scoreColor = getWeakScoreColor(entry.avgScore);
+                      const circumference = 2 * Math.PI * 16;
+                      const dashOffset = circumference * (1 - entry.avgScore / 100);
+                      return (
+                        <div key={entry.subject} className={`bb-weak-subj-card${isOpen ? " expanded" : ""}`}>
                           <div
-                            className={`bb-weak-score ${getWeakScoreClass(wt.avgScore)}`}
+                            className="bb-weak-subj-head"
+                            onClick={() => setExpandedSubject(isOpen ? null : entry.subject)}
                           >
-                            {wt.avgScore}%
+                            <div className={`bb-weak-subj-icon ${cfg.iconCls}`}>{cfg.icon}</div>
+                            <div className="bb-weak-score-ring">
+                              <svg width="44" height="44" viewBox="0 0 44 44">
+                                <circle cx="22" cy="22" r="16" fill="none" stroke="var(--bb-muted2)" strokeWidth="2.5" />
+                                <circle
+                                  cx="22" cy="22" r="16" fill="none"
+                                  stroke={scoreColor} strokeWidth="2.5"
+                                  strokeLinecap="round"
+                                  strokeDasharray={circumference}
+                                  strokeDashoffset={dashOffset}
+                                  style={{ transition: "stroke-dashoffset 0.8s ease" }}
+                                />
+                              </svg>
+                              <div className="bb-weak-score-num" style={{ color: scoreColor }}>
+                                {entry.avgScore}%
+                              </div>
+                            </div>
+                            <div className="bb-weak-subj-info">
+                              <div className="bb-weak-subj-name">{entry.subject}</div>
+                              <div className="bb-weak-subj-meta">
+                                <span>{entry.topicCount} weak topic{entry.topicCount > 1 ? "s" : ""}</span>
+                                <span className="meta-dot" />
+                                <span>Avg {entry.avgScore}%</span>
+                              </div>
+                            </div>
+                            <div className="bb-weak-subj-right">
+                              <div className="bb-weak-subj-progress">
+                                <div className="bb-weak-progress-bar">
+                                  <div
+                                    className="bb-weak-progress-fill"
+                                    style={{ width: `${entry.avgScore}%`, background: scoreColor }}
+                                  />
+                                </div>
+                              </div>
+                              <div className={`bb-weak-subj-chevron${isOpen ? " open" : ""}`}>
+                                <ChevronDown size={18} />
+                              </div>
+                            </div>
                           </div>
-                          <div className="bb-weak-info">
-                            <strong>{wt.topic}</strong>
-                            <span className="bb-weak-subject">
-                              {wt.subject}
-                            </span>
-                            <span className="bb-weak-suggestion">
-                              {wt.suggestion}
-                            </span>
-                          </div>
+                          {isOpen && (
+                            <div className="bb-weak-topics-inner">
+                              {entry.topics.map((wt, i) => {
+                                const tScoreClass = wt.avgScore < 30 ? "ts-critical" : wt.avgScore < 50 ? "ts-warning" : "ts-mild";
+                                return (
+                                  <div key={i} className={`bb-weak-topic-row ${getWeakScoreClass(wt.avgScore)}`}>
+                                    <div className={`bb-weak-topic-score ${tScoreClass}`}>
+                                      {wt.avgScore}%
+                                    </div>
+                                    <div className="bb-weak-topic-info">
+                                      <div className="bb-weak-topic-name">{wt.topic}</div>
+                                      <div className="bb-weak-topic-hint">{wt.suggestion}</div>
+                                    </div>
+                                    <button
+                                      className="bb-weak-practice-btn"
+                                      onClick={(e) => { e.stopPropagation(); navigate("/QuizSetup", { state: { prefilledSubject: entry.subject } }); }}
+                                    >
+                                      Practice <ChevronRight size={14} />
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                      ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>

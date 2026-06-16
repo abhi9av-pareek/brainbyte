@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 import axiosInstance from "../utils/axiosConfig"; // use axios so interceptor attaches token
-import { Bookmark, X, AlertTriangle, Check, Zap } from "lucide-react";
+import { Bookmark, X, AlertTriangle, Check, Zap, Globe } from "lucide-react";
 
 /* ─── Bookmark Popup Modal Component ─── */
 function BookmarkModal({ isOpen, onClose, question, onSave, existingNote }) {
@@ -142,6 +142,7 @@ const css = `
   .tag-easy   { background: rgba(0,229,192,0.15);  color: var(--accent2); border: 1px solid rgba(0,229,192,0.25); }
   .tag-medium { background: rgba(255,179,71,0.15); color: var(--amber);   border: 1px solid rgba(255,179,71,0.25); }
   .tag-hard   { background: rgba(255,107,107,0.15);color: var(--accent3); border: 1px solid rgba(255,107,107,0.25); }
+  .qz-nav-lang { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 20px; background: rgba(124,92,252,0.12); color: var(--accent); border: 1px solid rgba(124,92,252,0.2); display: flex; align-items: center; gap: 4px; }
   .qz-nav-subjects { font-size: 12px; color: var(--muted); max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .qz-nav-right { display: flex; align-items: center; gap: 12px; }
   .qz-quit-btn { font-size: 13px; color: var(--muted); background: none; border: 1px solid var(--muted2); border-radius: 8px; padding: 5px 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; }
@@ -400,6 +401,7 @@ export default function Quiz() {
     preGeneratedQuestions = null,
     scanId = null,
     isScannedQuiz = false,
+    language = "en",
   } = config;
 
   const [loadingState, setLoadingState] = useState("loading");
@@ -472,6 +474,7 @@ export default function Quiz() {
           subjects,
           difficulty,
           count: questionCount,
+          language,
         });
 
         const data = res.data;
@@ -811,6 +814,12 @@ export default function Quiz() {
           </div>
           <div className="qz-nav-meta">
             <span className={`qz-nav-tag tag-${diffTag}`}>{difficulty}</span>
+            {language && language !== "en" && (
+              <span className="qz-nav-lang">
+                <Globe size={12} />
+                {language.toUpperCase()}
+              </span>
+            )}
             <span className="qz-nav-subjects">
               {Array.isArray(subject) ? subject.join(" · ") : subject}
             </span>

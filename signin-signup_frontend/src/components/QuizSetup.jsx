@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sigma, Atom, FlaskConical, Cpu, Monitor, PenLine, Shuffle, Lightbulb, Zap, ClipboardList, Check, Brain } from "lucide-react";
+import { Sigma, Atom, FlaskConical, Cpu, Monitor, PenLine, Shuffle, Lightbulb, Zap, ClipboardList, Check, Brain, Globe } from "lucide-react";
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
@@ -74,7 +74,7 @@ const css = `
   .bb-pop-chip:hover { border-color: var(--accent); color: var(--accent); }
 
   /* DIFFICULTY */
-  .bb-diff-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem; }
+  .bb-diff-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
   .bb-diff-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1rem; cursor: pointer; transition: all .2s; }
   .bb-diff-card:hover { border-color: var(--border2); background: var(--surface2); }
   .bb-diff-card.sel-easy { border-color: #00E5C0; background: rgba(0,229,192,0.07); }
@@ -88,6 +88,30 @@ const css = `
   .bb-diff-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
   .bb-diff-dots { display: flex; gap: 4px; margin-top: 10px; }
   .bb-diff-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* SECTION DIVIDER */
+  .bb-section-divider { display: flex; align-items: center; gap: 12px; margin: 0.25rem 0 1.25rem; }
+  .bb-section-divider .divider-line { flex: 1; height: 1px; background: var(--border2); }
+  .bb-section-divider .divider-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+  /* LANGUAGE GRID */
+  .bb-lang-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1.75rem; max-height: 260px; overflow-y: auto; padding-right: 4px; }
+  .bb-lang-grid::-webkit-scrollbar { width: 4px; }
+  .bb-lang-grid::-webkit-scrollbar-track { background: transparent; }
+  .bb-lang-grid::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 4px; }
+  .bb-lang-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 0.5rem; cursor: pointer; transition: all .25s cubic-bezier(.4,0,.2,1); text-align: center; position: relative; overflow: hidden; }
+  .bb-lang-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(124,92,252,0.08), transparent 70%); opacity: 0; transition: opacity .25s; }
+  .bb-lang-card:hover { border-color: var(--border2); background: var(--surface2); transform: translateY(-1px); }
+  .bb-lang-card:hover::before { opacity: 1; }
+  .bb-lang-card.sel { border-color: var(--accent); background: rgba(124,92,252,0.08); box-shadow: 0 0 16px rgba(124,92,252,0.15); }
+  .bb-lang-card.sel::before { opacity: 1; }
+  .bb-lang-card .lang-flag { font-size: 22px; margin-bottom: 4px; line-height: 1; }
+  .bb-lang-card .lang-name { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.2; }
+  .bb-lang-card.sel .lang-name { color: var(--accent); }
+  .bb-lang-card .lang-native { font-size: 10px; color: var(--muted); margin-top: 1px; line-height: 1.2; }
+  .bb-lang-card.sel .lang-native { color: rgba(124,92,252,0.7); }
+  .bb-lang-card .lang-check { position: absolute; top: 5px; right: 5px; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.5); transition: all .2s cubic-bezier(.4,0,.2,1); }
+  .bb-lang-card.sel .lang-check { opacity: 1; transform: scale(1); }
 
   /* SETTINGS */
   .bb-slider-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 12px; }
@@ -143,6 +167,7 @@ const css = `
     .bb-panel-title { font-size: 22px; }
     .bb-subj-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .bb-diff-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .bb-lang-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
     .bb-opt-row { grid-template-columns: 1fr; gap: 8px; }
     .bb-btn-row { flex-direction: column; }
     .bb-btn-row .bb-btn { width: 100%; justify-content: center; }
@@ -163,6 +188,11 @@ const css = `
     .bb-subj-card .s-name { font-size: 12px; }
     .bb-diff-grid { grid-template-columns: 1fr; gap: 8px; }
     .bb-diff-card { padding: 1rem; }
+    .bb-lang-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; max-height: 220px; }
+    .bb-lang-card { padding: 0.6rem 0.4rem; border-radius: 10px; }
+    .bb-lang-card .lang-flag { font-size: 18px; }
+    .bb-lang-card .lang-name { font-size: 11px; }
+    .bb-lang-card .lang-native { font-size: 9px; }
     .bb-slider-section { padding: 1rem; }
     .bb-slider-val { font-size: 18px; }
     .bb-opt-card { padding: 0.75rem; }
@@ -220,6 +250,24 @@ const DIFFICULTIES = [
   },
 ];
 
+const LANGUAGES = [
+  { code: "en", name: "English",    flag: "🇬🇧", native: "English" },
+  { code: "hi", name: "Hindi",      flag: "🇮🇳", native: "हिन्दी" },
+  { code: "bn", name: "Bengali",    flag: "🇮🇳", native: "বাংলা" },
+  { code: "ta", name: "Tamil",      flag: "🇮🇳", native: "தமிழ்" },
+  { code: "te", name: "Telugu",     flag: "🇮🇳", native: "తెలుగు" },
+  { code: "mr", name: "Marathi",    flag: "🇮🇳", native: "मराठी" },
+  { code: "es", name: "Spanish",    flag: "🇪🇸", native: "Español" },
+  { code: "fr", name: "French",     flag: "🇫🇷", native: "Français" },
+  { code: "de", name: "German",     flag: "🇩🇪", native: "Deutsch" },
+  { code: "ja", name: "Japanese",   flag: "🇯🇵", native: "日本語" },
+  { code: "ko", name: "Korean",     flag: "🇰🇷", native: "한국어" },
+  { code: "zh", name: "Chinese",    flag: "🇨🇳", native: "中文" },
+  { code: "pt", name: "Portuguese", flag: "🇧🇷", native: "Português" },
+  { code: "ar", name: "Arabic",     flag: "🇸🇦", native: "العربية" },
+  { code: "ru", name: "Russian",    flag: "🇷🇺", native: "Русский" },
+];
+
 const OPTIONS = [
   {
     id: "shuffle",
@@ -256,7 +304,7 @@ const OPTIONS = [
 ];
 
 function Stepper({ step }) {
-  const labels = ["Subject", "Difficulty", "Settings", "Review"];
+  const labels = ["Subject", "Difficulty & Lang", "Settings", "Review"];
   return (
     <div className="bb-stepper-wrap">
       {labels.map((label, i) => {
@@ -296,6 +344,7 @@ export default function QuizSetup() {
   const [customList, setCustomList] = useState([]);
   const [customInput, setCustomInput] = useState("");
   const [difficulty, setDifficulty] = useState("");
+  const [language, setLanguage] = useState("en");
   const [questions, setQuestions] = useState(10);
   const [timePerQ, setTimePerQ] = useState(30);
   const [options, setOptions] = useState(() =>
@@ -344,6 +393,7 @@ export default function QuizSetup() {
           ? "coral"
           : "";
   const isCustomSel = customList.length > 0;
+  const selectedLang = LANGUAGES.find((l) => l.code === language);
 
   return (
     <>
@@ -455,9 +505,9 @@ export default function QuizSetup() {
             <div>
               <div className="bb-panel-header">
                 <div className="bb-panel-eyebrow">Step 2 of 4</div>
-                <div className="bb-panel-title">Set the difficulty</div>
+                <div className="bb-panel-title">Difficulty & Language</div>
                 <div className="bb-panel-sub">
-                  How challenging should the questions be?
+                  Set the challenge level and pick your preferred language.
                 </div>
               </div>
               <div className="bb-diff-grid">
@@ -484,6 +534,32 @@ export default function QuizSetup() {
                   </div>
                 ))}
               </div>
+
+              <div className="bb-section-divider">
+                <div className="divider-line" />
+                <div className="divider-label">
+                  <Globe size={13} /> Select Language
+                </div>
+                <div className="divider-line" />
+              </div>
+
+              <div className="bb-lang-grid">
+                {LANGUAGES.map((lang) => (
+                  <div
+                    key={lang.code}
+                    className={`bb-lang-card${language === lang.code ? " sel" : ""}`}
+                    onClick={() => setLanguage(lang.code)}
+                  >
+                    <div className="lang-check">
+                      <Check size={10} color="#fff" />
+                    </div>
+                    <div className="lang-flag">{lang.flag}</div>
+                    <div className="lang-name">{lang.name}</div>
+                    <div className="lang-native">{lang.native}</div>
+                  </div>
+                ))}
+              </div>
+
               <div className="bb-btn-row">
                 <button
                   className="bb-btn bb-btn-ghost"
@@ -493,7 +569,7 @@ export default function QuizSetup() {
                 </button>
                 <button
                   className="bb-btn bb-btn-primary"
-                  disabled={!difficulty}
+                  disabled={!difficulty || !language}
                   onClick={() => setStep(3)}
                 >
                   Continue →
@@ -611,6 +687,12 @@ export default function QuizSetup() {
                   </div>
                 </div>
                 <div className="bb-summary-row">
+                  <div className="bb-summary-key">Language</div>
+                  <div className="bb-summary-val accent">
+                    {selectedLang ? `${selectedLang.flag} ${selectedLang.name}` : "English"}
+                  </div>
+                </div>
+                <div className="bb-summary-row">
                   <div className="bb-summary-key">Questions</div>
                   <div className="bb-summary-val">{questions} questions</div>
                 </div>
@@ -637,7 +719,7 @@ export default function QuizSetup() {
                 <div className="bb-est-text">
                   <strong>{questions} questions</strong> in{" "}
                   <strong>{difficulty}</strong> mode on{" "}
-                  <strong>{subject}</strong>. Estimated time: ~{totalMin} min.
+                  <strong>{subject}</strong>{language !== "en" && selectedLang ? <> in <strong>{selectedLang.name}</strong></> : ""}. Estimated time: ~{totalMin} min.
                   You've got this!
                 </div>
               </div>
@@ -658,6 +740,7 @@ export default function QuizSetup() {
                         questions,
                         timePerQ,
                         options,
+                        language,
                       },
                     })
                   }

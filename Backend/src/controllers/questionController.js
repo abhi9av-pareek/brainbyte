@@ -27,16 +27,28 @@ const httpsAgent = new https.Agent({ keepAlive: true, keepAliveMsecs: 30000 });
 const quizCache = new Map();
 const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour
 
-const getCacheKey = (subjects, difficulty, count) =>
-  `${Array.isArray(subjects) ? subjects.sort().join("+") : subjects}__${difficulty}__${count}`;
+const getCacheKey = (subjects, difficulty, count, language = "en") =>
+  `${Array.isArray(subjects) ? subjects.sort().join("+") : subjects}__${difficulty}__${count}__${language}`;
+
+// ─── Language name map for prompts ─────────────────────────────────────────────
+const LANGUAGE_NAMES = {
+  en: "English", hi: "Hindi", es: "Spanish", fr: "French", de: "German",
+  ja: "Japanese", ko: "Korean", zh: "Chinese", pt: "Portuguese", ar: "Arabic",
+  ru: "Russian", bn: "Bengali", ta: "Tamil", te: "Telugu", mr: "Marathi",
+};
 
 // ─── Prompt builder ────────────────────────────────────────────────────────────
 // Optimized: much shorter prompt = fewer input tokens = faster first-token
-const buildPrompt = (subjects, difficulty, count) => {
+const buildPrompt = (subjects, difficulty, count, language = "en") => {
   const subjectList = Array.isArray(subjects) ? subjects.join(", ") : subjects;
+  const langName = LANGUAGE_NAMES[language] || language;
+  const langInstruction =
+    language && language !== "en"
+      ? `\nIMPORTANT: Generate ALL text (questions, options) in ${langName} language. Every question and every option MUST be written in ${langName}.`
+      : "";
 
   return `
-Generate ${count} ${difficulty} MCQs on ${subjectList}.
+Generate ${count} ${difficulty} MCQs on ${subjectList}.${langInstruction}
 
 Return ONLY JSON:
 {"quiz":[{"question":"","options":["","","",""],"correctAnswer":"A"}]}`;
@@ -149,15 +161,15 @@ const callNvidia = async (prompt) => {
 };
 
 // ─── Generate one chunk with retries ──────────────────────────────────────────
-const generateChunk = async (subjects, difficulty, chunkSize) => {
+const generateChunk = async (subjects, difficulty, chunkSize, language = "en") => {
   const MAX_RETRIES = 2;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       console.log(
-        `  Chunk attempt ${attempt}: generating ${chunkSize} questions...`,
+        `  Chunk attempt ${attempt}: generating ${chunkSize} questions (lang: ${language})...`,
       );
-      const prompt = buildPrompt(subjects, difficulty, chunkSize);
+      const prompt = buildPrompt(subjects, difficulty, chunkSize, language);
       const rawText = await callNvidia(prompt);
 
       console.log(`  Raw response preview: ${rawText.slice(0, 150)}`);
@@ -176,12 +188,12 @@ const generateChunk = async (subjects, difficulty, chunkSize) => {
 // ─── Chunked generation: splits requests into ≤5-question batches ─────────────
 // Using 5 instead of 10 gives better parallelism:
 // 10 questions = 2 parallel 5-question calls ≈ half the wall-clock time
-const generateInChunks = async (subjects, difficulty, totalCount) => {
+const generateInChunks = async (subjects, difficulty, totalCount, language = "en") => {
   const CHUNK_SIZE = 5;
 
   if (totalCount <= CHUNK_SIZE) {
     // Small request — single call
-    return generateChunk(subjects, difficulty, totalCount);
+    return generateChunk(subjects, difficulty, totalCount, language);
   }
 
   // Split into chunks
@@ -193,12 +205,12 @@ const generateInChunks = async (subjects, difficulty, totalCount) => {
   }
 
   console.log(
-    `Splitting into ${chunks.length} parallel chunks: ${chunks.join(", ")} questions`,
+    `Splitting into ${chunks.length} parallel chunks: ${chunks.join(", ")} questions (lang: ${language})`,
   );
 
   // Run ALL chunks in parallel (Promise.all)
   const results = await Promise.all(
-    chunks.map((size) => generateChunk(subjects, difficulty, size)),
+    chunks.map((size) => generateChunk(subjects, difficulty, size, language)),
   );
 
   return results.flat();
@@ -269,6 +281,7 @@ export const generateQuestions = async (req, res) => {
       difficulty = "Medium",
       count = 10,
       timePerQuestion = 30,
+      language = "en",
     } = req.body;
 
     // Validation
@@ -283,14 +296,17 @@ export const generateQuestions = async (req, res) => {
     const safeDifficulty = ["Easy", "Medium", "Hard"].includes(difficulty)
       ? difficulty
       : "Medium";
+    const safeLanguage = Object.keys(LANGUAGE_NAMES).includes(language)
+      ? language
+      : "en";
 
     console.log(`\n=== Quiz Generation ===`);
     console.log(
-      `Subjects: ${subjects} | Difficulty: ${safeDifficulty} | Count: ${safeCount}`,
+      `Subjects: ${subjects} | Difficulty: ${safeDifficulty} | Count: ${safeCount} | Language: ${safeLanguage} (${LANGUAGE_NAMES[safeLanguage]})`,
     );
 
     // ── Cache check ──────────────────────────────────────────────────────────
-    const cacheKey = getCacheKey(subjects, safeDifficulty, safeCount);
+    const cacheKey = getCacheKey(subjects, safeDifficulty, safeCount, safeLanguage);
     const cached = quizCache.get(cacheKey);
 
     if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
@@ -317,6 +333,7 @@ export const generateQuestions = async (req, res) => {
       subjects,
       safeDifficulty,
       safeCount,
+      safeLanguage,
     );
 
     // Sanitize
@@ -350,6 +367,7 @@ export const generateQuestions = async (req, res) => {
         subjects: Array.isArray(subjects) ? subjects : [subjects],
         difficulty: safeDifficulty,
         count: questions.length,
+        language: safeLanguage,
         model: NVIDIA_MODEL,
         fromCache: false,
         generatedAt: new Date().toISOString(),
