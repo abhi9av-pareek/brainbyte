@@ -22,3 +22,8 @@ body {
     align-items: center;
     justify-content: center;
 }
+
+/* Premium buttery-smooth dark/light theme transition duration */
+html, body, div, header, select, button, input, textarea, span, table, tr, td, th, section, aside, h1, h2, h3, h4, h5, h6, pre {
+    transition: background-color 600ms cubic-bezier(0.4, 0, 0.2, 1), border-color 600ms cubic-bezier(0.4, 0, 0.2, 1), color 400ms cubic-bezier(0.4, 0, 0.2, 1), fill 400ms cubic-bezier(0.4, 0, 0.2, 1), stroke 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}

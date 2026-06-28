@@ -7,6 +7,10 @@ import authRoutes from "./src/routes/authRoutes.js";
 import quizRoutes from "./src/routes/quizRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import scanRoutes from "./src/routes/scanRoutes.js";
+import dsaProblemRoutes from "./src/routes/problemRoutes.js";
+import dsaSubmissionRoutes from "./src/routes/submissionRoutes.js";
+import dsaAiRoutes from "./src/routes/aiRoutes.js";
+import dsaProgressRoutes from "./src/routes/progressRoutes.js";
 
 dotenv.config();
 
@@ -55,6 +59,12 @@ app.use("/api/quiz", quizRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/scan", scanRoutes);
+
+// DSA Sheet Routes
+app.use("/api/dsa/problems", dsaProblemRoutes);
+app.use("/api/dsa/problems", dsaSubmissionRoutes);
+app.use("/api/dsa/ai", dsaAiRoutes);
+app.use("/api/dsa/progress", dsaProgressRoutes);
 
 // root route
 app.get("/", (req, res) => {

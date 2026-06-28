@@ -157,6 +157,33 @@ const userSchema = new mongoose.Schema(
       type: [bookmarkSchema],
       default: [],
     },
+
+    /* ── DSA PROGRESS ── */
+    dsaProgress: {
+      solvedProblems: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "Problem",
+        default: [],
+      },
+      topicStatus: [
+        {
+          topicName: { type: String },
+          solvedCount: { type: Number, default: 0 },
+        },
+      ],
+      dailyGoalCount: {
+        type: Number,
+        default: 2,
+      },
+      dailyGoalProgress: {
+        type: Number,
+        default: 0,
+      },
+      lastSolvedDate: {
+        type: Date,
+        default: null,
+      },
+    },
   },
   {
     timestamps: true,
