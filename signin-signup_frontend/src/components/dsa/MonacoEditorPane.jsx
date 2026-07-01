@@ -53,12 +53,12 @@ const MonacoEditorPane = ({
 
   return (
     <div className={`h-full flex flex-col border rounded-2xl overflow-hidden transition-all duration-300 ${
-      isDark ? "bg-zinc-900 border-zinc-800/80 shadow-lg" : "bg-white border-slate-200 shadow-sm"
+      isDark ? "bg-[#1e1e1e] border-[#2e2e2e] shadow-lg" : "bg-white border-slate-200 shadow-sm"
     }`}>
       
       {/* Top Toolbar */}
       <div className={`flex flex-wrap items-center justify-between px-4 py-3 border-b gap-3 transition-colors ${
-        isDark ? "bg-zinc-950 border-zinc-850" : "bg-slate-50 border-slate-200"
+        isDark ? "bg-[#252525] border-[#2e2e2e]" : "bg-slate-50 border-slate-200"
       }`}>
         {/* Language Select */}
         <div className="flex items-center gap-2">
@@ -68,7 +68,7 @@ const MonacoEditorPane = ({
             onChange={(e) => onLanguageChange(e.target.value)}
             disabled={executing}
             className={`border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 transition-all font-bold ${
-              isDark ? "bg-zinc-900 border-zinc-850 text-zinc-300" : "bg-white border-slate-250 text-slate-700 shadow-xs"
+              isDark ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-300" : "bg-white border-slate-250 text-slate-700 shadow-xs"
             }`}
           >
             {languages.map((l) => (
@@ -81,7 +81,7 @@ const MonacoEditorPane = ({
         <div className="flex items-center gap-2">
           {/* Font sizing */}
           <div className={`flex items-center border rounded-lg p-0.5 ${
-            isDark ? "bg-zinc-900 border-zinc-850" : "bg-white border-slate-250 shadow-xs"
+            isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-white border-slate-250 shadow-xs"
           }`}>
             <button
               onClick={handleZoomOut}
@@ -110,7 +110,7 @@ const MonacoEditorPane = ({
               onClick={onToggleCustomInput}
               className={`p-1.5 border rounded-lg transition-all flex items-center gap-1 text-[11px] font-bold ${
                 isDark 
-                  ? "bg-zinc-900 border-zinc-855 text-zinc-400 hover:text-indigo-400" 
+                  ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-400 hover:text-indigo-400" 
                   : "bg-white border-slate-250 text-slate-600 hover:text-indigo-650 shadow-xs"
               }`}
               title={isCustomInputOpen ? "Hide Test Cases Panel" : "Show Test Cases Panel"}
@@ -126,7 +126,7 @@ const MonacoEditorPane = ({
             onClick={onToggleFullScreen}
             className={`p-1.5 border rounded-lg transition-all ${
               isDark 
-                ? "bg-zinc-900 border-zinc-850 text-zinc-400 hover:text-indigo-400" 
+                ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-400 hover:text-indigo-400" 
                 : "bg-white border-slate-250 text-slate-550 hover:text-indigo-650 shadow-xs"
             }`}
             title={isFullScreen ? "Minimize Editor" : "Maximize Editor"}
@@ -177,14 +177,14 @@ const MonacoEditorPane = ({
 
       {/* Code Controls Footer */}
       <div className={`px-4 py-3 border-t flex justify-end items-center gap-3 transition-colors ${
-        isDark ? "bg-zinc-950 border-zinc-850" : "bg-slate-50 border-slate-200"
+        isDark ? "bg-[#252525] border-[#2e2e2e]" : "bg-slate-50 border-slate-200"
       }`}>
         <button
           onClick={onRun}
           disabled={executing}
           className={`font-semibold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-all focus:outline-none disabled:opacity-50 border ${
             isDark 
-              ? "bg-zinc-900 hover:bg-zinc-850 border-zinc-850 text-zinc-300" 
+              ? "bg-[#1a1a1a] hover:bg-[#252525] border-[#2e2e2e] text-zinc-300" 
               : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 shadow-xs"
           }`}
         >

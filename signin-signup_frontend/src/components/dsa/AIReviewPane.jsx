@@ -8,11 +8,11 @@ const AIReviewPane = ({ isOpen, onClose, review, loading, error, onRetry, theme 
 
   return (
     <div className={`fixed inset-y-0 right-0 w-full sm:w-[480px] border-l shadow-2xl z-50 flex flex-col font-sans transition-all duration-300 ${
-      isDark ? "bg-[#09090b] border-zinc-800 text-zinc-200" : "bg-white border-slate-200 text-black"
+      isDark ? "bg-[#1e1e1e] border-[#2e2e2e] text-zinc-200" : "bg-white border-slate-200 text-black"
     }`}>
       
       {/* Header */}
-      <div className={`p-4 border-b flex justify-between items-center ${isDark ? "bg-zinc-900 border-zinc-800" : "bg-white border-slate-200"}`}>
+      <div className={`p-4 border-b flex justify-between items-center ${isDark ? "bg-[#252525] border-[#2e2e2e]" : "bg-white border-slate-200"}`}>
         <h3 className={`font-extrabold text-sm tracking-wide flex items-center gap-2 ${
           isDark ? "text-transparent bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text" : "text-indigo-600"
         }`}>
@@ -68,7 +68,7 @@ const AIReviewPane = ({ isOpen, onClose, review, loading, error, onRetry, theme 
             {/* Rating and Complexities Row */}
             <div className="grid grid-cols-3 gap-3">
               <div className={`border rounded-xl p-3 flex flex-col items-center justify-center text-center ${
-                isDark ? "bg-zinc-900 border-zinc-850" : "bg-white border-slate-200 shadow-xs text-black"
+                isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-white border-slate-200 shadow-xs text-black"
               }`}>
                 <span className={`text-[9px] uppercase tracking-wider font-bold ${isDark ? "text-zinc-500" : "text-slate-400"}`}>Grade</span>
                 <span className="text-xl font-black text-indigo-650 mt-1">
@@ -76,7 +76,7 @@ const AIReviewPane = ({ isOpen, onClose, review, loading, error, onRetry, theme 
                 </span>
               </div>
               <div className={`border rounded-xl p-3 flex flex-col items-center justify-center text-center ${
-                isDark ? "bg-zinc-900 border-zinc-850" : "bg-white border-slate-200 shadow-xs text-black"
+                isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-white border-slate-200 shadow-xs text-black"
               }`}>
                 <span className={`text-[9px] uppercase tracking-wider font-bold ${isDark ? "text-zinc-500" : "text-slate-400"}`}>Time</span>
                 <span className="text-xs font-mono font-bold text-emerald-600 mt-2 truncate max-w-full">
@@ -84,7 +84,7 @@ const AIReviewPane = ({ isOpen, onClose, review, loading, error, onRetry, theme 
                 </span>
               </div>
               <div className={`border rounded-xl p-3 flex flex-col items-center justify-center text-center ${
-                isDark ? "bg-zinc-900 border-zinc-850" : "bg-white border-slate-200 shadow-xs text-black"
+                isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-white border-slate-200 shadow-xs text-black"
               }`}>
                 <span className={`text-[9px] uppercase tracking-wider font-bold ${isDark ? "text-zinc-500" : "text-slate-400"}`}>Space</span>
                 <span className="text-xs font-mono font-bold text-purple-650 mt-2 truncate max-w-full">
@@ -95,7 +95,7 @@ const AIReviewPane = ({ isOpen, onClose, review, loading, error, onRetry, theme 
 
             {/* Time / Space Complexity Detail */}
             <div className={`border p-4 rounded-xl flex flex-col gap-2 ${
-              isDark ? "bg-zinc-900/60 border-zinc-850" : "bg-white border-slate-200 shadow-xs"
+              isDark ? "bg-[#1a1a1a]/60 border-[#2e2e2e]" : "bg-white border-slate-200 shadow-xs"
             }`}>
               <h4 className="text-xs font-bold text-indigo-650 uppercase tracking-wider">Complexity Details</h4>
               <div className={`text-xs flex flex-col gap-1.5 font-mono ${isDark ? "text-zinc-300" : "text-black"}`}>
@@ -106,7 +106,7 @@ const AIReviewPane = ({ isOpen, onClose, review, loading, error, onRetry, theme 
 
             {/* Optimal Better Approach */}
             <div className={`border p-4 rounded-xl flex flex-col gap-2 ${
-              isDark ? "bg-zinc-900/60 border-zinc-850" : "bg-white border-slate-200 shadow-xs"
+              isDark ? "bg-[#1a1a1a]/60 border-[#2e2e2e]" : "bg-white border-slate-200 shadow-xs"
             }`}>
               <h4 className="text-xs font-bold text-pink-600 uppercase tracking-wider">Optimal Strategy Suggestions</h4>
               <p className={`text-xs leading-relaxed font-sans ${isDark ? "text-zinc-300" : "text-black"}`}>
@@ -144,7 +144,7 @@ const AIReviewPane = ({ isOpen, onClose, review, loading, error, onRetry, theme 
 
             {/* Dry Run Explanation */}
             <div className={`border p-4 rounded-xl flex flex-col gap-2 ${
-              isDark ? "bg-zinc-950 border-zinc-850" : "bg-white border-slate-200 shadow-inner"
+              isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-white border-slate-200 shadow-inner"
             }`}>
               <h4 className="text-xs font-bold text-amber-600 uppercase tracking-wider font-mono">Trace / Dry Run Log</h4>
               <p className={`text-xs font-mono leading-relaxed whitespace-pre-wrap ${isDark ? "text-zinc-400" : "text-black"}`}>
@@ -175,7 +175,7 @@ const AIReviewPane = ({ isOpen, onClose, review, loading, error, onRetry, theme 
 
       {/* Footer */}
       <div className={`p-4 border-t flex items-center justify-between text-xs transition-colors ${
-        isDark ? "bg-zinc-900 border-zinc-800 text-zinc-500" : "bg-white border-slate-200 text-slate-500"
+        isDark ? "bg-[#252525] border-[#2e2e2e] text-zinc-500" : "bg-white border-slate-200 text-slate-500"
       }`}>
         <span>Powered by DeepSeek V4 NIM</span>
         <span className="flex items-center gap-1 text-indigo-600 font-semibold">

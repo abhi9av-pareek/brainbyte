@@ -36,18 +36,20 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
 
   const testCases = result?.testCasesResults || [];
   const customCase = result?.customResult;
-  const isCompilationError = result?.errorType === "Compilation Error" || (result && !result.success && !result.testCasesResults);
+  const isCompilationError = result?.errorType === "Compilation Error" || 
+                             result?.status === "Compilation Error" ||
+                             (result && !result.success && !result.testCasesResults && result.status !== "Accepted" && result.status !== "Wrong Answer");
 
   return (
     <div className={`h-full border rounded-2xl flex flex-col overflow-hidden transition-all duration-300 ${
-      isDark ? "bg-zinc-900 border-zinc-800" : "bg-white border-slate-200 shadow-sm"
+      isDark ? "bg-[#1e1e1e] border-[#2e2e2e]" : "bg-white border-slate-200 shadow-sm"
     }`}>
       
       {/* Console Header (Always visible) */}
       <div 
         onClick={handleToggleMinimize}
         className={`flex justify-between items-center px-5 py-3 border-b cursor-pointer select-none transition-colors ${
-          isDark ? "border-zinc-850 hover:bg-zinc-850/40" : "border-slate-150 hover:bg-slate-50"
+          isDark ? "border-[#2e2e2e] hover:bg-[#252525]/40" : "border-slate-150 hover:bg-slate-50"
         }`}
       >
         <h3 className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${
@@ -73,7 +75,7 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
             <button
               onClick={handleToggleMaximize}
               className={`p-1 rounded-md transition-colors ${
-                isDark ? "hover:bg-zinc-800 text-zinc-500 hover:text-zinc-350" : "hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+                isDark ? "hover:bg-[#252525] text-zinc-500 hover:text-zinc-350" : "hover:bg-slate-100 text-slate-400 hover:text-slate-700"
               }`}
               title={isMaximized ? "Restore Console" : "Maximize Console"}
             >
@@ -84,7 +86,7 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
             <button
               onClick={handleToggleMinimize}
               className={`p-1 rounded-md transition-colors ${
-                isDark ? "hover:bg-zinc-800 text-zinc-500 hover:text-zinc-350" : "hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+                isDark ? "hover:bg-[#252525] text-zinc-500 hover:text-zinc-350" : "hover:bg-slate-100 text-slate-400 hover:text-slate-700"
               }`}
               title={isCollapsed ? "Expand Console" : "Collapse Console"}
             >
@@ -118,11 +120,11 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
                 <span>Compilation Error</span>
               </div>
               <div className={`border rounded-xl p-3 flex flex-col gap-1.5 font-mono text-xs ${
-                isDark ? "bg-zinc-950 border-zinc-850" : "bg-slate-50 border-slate-200"
+                isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-slate-50 border-slate-200"
               }`}>
                 <span className="text-rose-500 font-bold uppercase text-[9px]">Error Detail</span>
                 <pre className="text-rose-650 whitespace-pre-wrap leading-relaxed">
-                  {result.errorMessage || "Compilation failed."}
+                  {result.failedTestCase?.userOutput || result.errorMessage || "Compilation failed."}
                 </pre>
               </div>
             </div>
@@ -131,14 +133,14 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
             <div className="flex flex-col gap-4 flex-1">
               
               {/* Test Cases Tabs Header */}
-              <div className="flex flex-wrap gap-2 border-b border-zinc-850 pb-2">
+              <div className="flex flex-wrap gap-2 border-b border-[#2e2e2e] pb-2">
                 {testCases.map((tc, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveCaseTab(idx)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all ${
                       activeCaseTab === idx
-                        ? isDark ? "bg-zinc-800 border-zinc-700 text-indigo-400" : "bg-slate-100 border-slate-300 text-indigo-650 font-bold shadow-xs"
+                        ? isDark ? "bg-[#252525] border-[#333333] text-indigo-400" : "bg-slate-100 border-slate-300 text-indigo-650 font-bold shadow-xs"
                         : isDark ? "bg-transparent border-transparent text-zinc-500 hover:text-zinc-300" : "bg-transparent border-transparent text-slate-500 hover:text-slate-800"
                     }`}
                   >
@@ -151,7 +153,7 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
                     onClick={() => setActiveCaseTab(testCases.length)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all ${
                       activeCaseTab === testCases.length
-                        ? isDark ? "bg-zinc-800 border-zinc-700 text-indigo-400" : "bg-slate-100 border-slate-300 text-indigo-650 font-bold shadow-xs"
+                        ? isDark ? "bg-[#252525] border-[#333333] text-indigo-400" : "bg-slate-100 border-slate-300 text-indigo-650 font-bold shadow-xs"
                         : isDark ? "bg-transparent border-transparent text-zinc-500 hover:text-zinc-300" : "bg-transparent border-transparent text-slate-500 hover:text-slate-800"
                     }`}
                   >
@@ -175,15 +177,15 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div className={`border p-3 rounded-xl flex flex-col gap-1.5 ${isDark ? "bg-zinc-950 border-zinc-850" : "bg-slate-50 border-slate-200"}`}>
+                        <div className={`border p-3 rounded-xl flex flex-col gap-1.5 ${isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-slate-50 border-slate-200"}`}>
                           <span className="text-zinc-500 text-[9px] uppercase font-bold">Input</span>
                           <pre className={isDark ? "text-zinc-300" : "text-slate-750"}>{tc.input}</pre>
                         </div>
-                        <div className={`border p-3 rounded-xl flex flex-col gap-1.5 border-l-2 border-emerald-500 ${isDark ? "bg-zinc-950 border-zinc-850" : "bg-slate-50 border-slate-200"}`}>
+                        <div className={`border p-3 rounded-xl flex flex-col gap-1.5 border-l-2 border-emerald-500 ${isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-slate-50 border-slate-200"}`}>
                           <span className="text-emerald-500 text-[9px] uppercase font-bold">Expected Output</span>
                           <pre className="text-emerald-600 font-semibold">{tc.expectedOutput}</pre>
                         </div>
-                        <div className={`border p-3 rounded-xl flex flex-col gap-1.5 border-l-2 ${tc.success ? "border-emerald-500" : "border-rose-500"} ${isDark ? "bg-zinc-950 border-zinc-855" : "bg-slate-50 border-slate-200"}`}>
+                        <div className={`border p-3 rounded-xl flex flex-col gap-1.5 border-l-2 ${tc.success ? "border-emerald-500" : "border-rose-500"} ${isDark ? "bg-[#1a1a1a] border-[#2e2e2e]/60" : "bg-slate-50 border-slate-200"}`}>
                           <span className={`${tc.success ? "text-emerald-500" : "text-rose-500"} text-[9px] uppercase font-bold`}>Your Output</span>
                           <pre className={`${tc.success ? "text-emerald-600" : "text-rose-600"} font-semibold`}>
                             {tc.stdout.trim() || "(empty)"}
@@ -192,7 +194,7 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
                       </div>
 
                       {tc.stderr && (
-                        <div className={`border rounded-xl p-3 flex flex-col gap-1.5 border-l-2 border-rose-500 ${isDark ? "bg-zinc-950 border-zinc-850" : "bg-slate-50 border-slate-200"}`}>
+                        <div className={`border rounded-xl p-3 flex flex-col gap-1.5 border-l-2 border-rose-500 ${isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-slate-50 border-slate-200"}`}>
                           <span className="text-rose-500 font-bold uppercase text-[9px]">Runtime Error / Stderr</span>
                           <pre className="text-rose-600 whitespace-pre-wrap leading-relaxed">{tc.stderr}</pre>
                         </div>
@@ -211,11 +213,11 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div className={`border p-3 rounded-xl flex flex-col gap-1.5 ${isDark ? "bg-zinc-950 border-zinc-850" : "bg-slate-50 border-slate-200"}`}>
+                      <div className={`border p-3 rounded-xl flex flex-col gap-1.5 ${isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-slate-50 border-slate-200"}`}>
                         <span className="text-zinc-500 text-[9px] uppercase font-bold">Input</span>
                         <pre className={isDark ? "text-zinc-300" : "text-slate-750"}>{customCase.input}</pre>
                       </div>
-                      <div className={`border p-3 rounded-xl flex flex-col gap-1.5 border-l-2 ${customCase.success ? "border-emerald-500" : "border-rose-500"} ${isDark ? "bg-zinc-950 border-zinc-855" : "bg-slate-50 border-slate-200"}`}>
+                      <div className={`border p-3 rounded-xl flex flex-col gap-1.5 border-l-2 ${customCase.success ? "border-emerald-500" : "border-rose-500"} ${isDark ? "bg-[#1a1a1a] border-[#2e2e2e]/60" : "bg-slate-50 border-slate-200"}`}>
                         <span className={`${customCase.success ? "text-emerald-500" : "text-rose-500"} text-[9px] uppercase font-bold`}>Your Output</span>
                         <pre className={`${customCase.success ? "text-emerald-600" : "text-rose-600"} font-semibold`}>
                           {customCase.stdout.trim() || "(empty)"}
@@ -224,7 +226,7 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
                     </div>
 
                     {customCase.stderr && (
-                      <div className={`border rounded-xl p-3 flex flex-col gap-1.5 border-l-2 border-rose-500 ${isDark ? "bg-zinc-950 border-zinc-850" : "bg-slate-50 border-slate-200"}`}>
+                      <div className={`border rounded-xl p-3 flex flex-col gap-1.5 border-l-2 border-rose-500 ${isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-slate-50 border-slate-200"}`}>
                         <span className="text-rose-500 font-bold uppercase text-[9px]">Runtime Error / Stderr</span>
                         <pre className="text-rose-600 whitespace-pre-wrap leading-relaxed">{customCase.stderr}</pre>
                       </div>
@@ -270,15 +272,15 @@ const OutputConsole = ({ result, executing, type, theme, consoleState, setConsol
                     {result.status === "Wrong Answer" ? "Failing Test Case Case" : "Runtime Exception Case"}
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono">
-                    <div className={`border p-3 rounded-xl flex flex-col gap-1.5 ${isDark ? "bg-zinc-950 border-zinc-850" : "bg-slate-50 border-slate-200"}`}>
+                    <div className={`border p-3 rounded-xl flex flex-col gap-1.5 ${isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-slate-50 border-slate-200"}`}>
                       <span className="text-zinc-500 text-[9px] uppercase font-bold">Input</span>
                       <pre className={isDark ? "text-zinc-300" : "text-slate-750"}>{result.failedTestCase.input}</pre>
                     </div>
-                    <div className={`border p-3 rounded-xl flex flex-col gap-1.5 border-l-2 border-emerald-500 ${isDark ? "bg-zinc-950 border-zinc-855" : "bg-slate-50 border-slate-200"}`}>
+                    <div className={`border p-3 rounded-xl flex flex-col gap-1.5 border-l-2 border-emerald-500 ${isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-slate-50 border-slate-200"}`}>
                       <span className="text-emerald-500 text-[9px] uppercase font-bold">Expected Output</span>
                       <pre className="text-emerald-600 font-semibold">{result.failedTestCase.expectedOutput}</pre>
                     </div>
-                    <div className={`border p-3 rounded-xl flex flex-col gap-1.5 border-l-2 border-rose-500 ${isDark ? "bg-zinc-950 border-zinc-855" : "bg-slate-50 border-slate-200"}`}>
+                    <div className={`border p-3 rounded-xl flex flex-col gap-1.5 border-l-2 border-rose-500 ${isDark ? "bg-[#1a1a1a] border-[#2e2e2e]/60" : "bg-slate-50 border-slate-200"}`}>
                       <span className="text-rose-500 text-[9px] uppercase font-bold">Your Output</span>
                       <pre className="text-rose-600 font-semibold">{result.failedTestCase.userOutput}</pre>
                     </div>

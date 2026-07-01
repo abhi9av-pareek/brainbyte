@@ -75,7 +75,18 @@ const DSADashboard = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("");
 
-  const topicsList = ["Arrays", "Strings", "Linked List", "Trees", "Graphs", "Dynamic Programming"];
+  const topicsList = [
+    "Mathematics",
+    "Arrays",
+    "Strings",
+    "Linked List",
+    "Prefix Sum",
+    "Sliding Window",
+    "Binary Search",
+    "Trees",
+    "Graphs",
+    "Dynamic Programming"
+  ];
   const difficultiesList = ["Easy", "Medium", "Hard"];
   const companiesList = ["Google", "Amazon", "Microsoft", "Apple", "Facebook", "Uber"];
 
@@ -135,7 +146,7 @@ const DSADashboard = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 font-sans p-6 md:p-10 ${
-      isDark ? "bg-[#030303] text-zinc-100" : "bg-slate-50 text-slate-900"
+      isDark ? "bg-[#1a1a1a] text-zinc-100" : "bg-slate-50 text-slate-900"
     }`}>
       
       {/* Header */}
@@ -167,7 +178,7 @@ const DSADashboard = () => {
             onClick={toggleTheme}
             className={`p-2.5 rounded-xl border transition-all ${
               isDark 
-                ? "bg-zinc-900 border-zinc-800 text-yellow-400 hover:bg-zinc-850" 
+                ? "bg-[#1e1e1e] border-[#2e2e2e] text-yellow-400 hover:bg-[#2a2a2a]" 
                 : "bg-white border-slate-200 text-indigo-600 hover:bg-slate-100 shadow-sm"
             }`}
             title="Toggle Light/Dark Theme"
@@ -181,7 +192,7 @@ const DSADashboard = () => {
             disabled={refreshing}
             className={`p-2.5 rounded-xl border transition-all ${
               isDark 
-                ? "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-850" 
+                ? "bg-[#1e1e1e] border-[#2e2e2e] text-zinc-400 hover:text-zinc-200 hover:bg-[#2a2a2a]" 
                 : "bg-white border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-100 shadow-sm"
             }`}
             title="Refresh Progress"
@@ -219,7 +230,7 @@ const DSADashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Questions Solved */}
               <div className={`border rounded-2xl p-5 flex items-center justify-between transition-all ${
-                isDark ? "bg-zinc-900 border-zinc-800/80 shadow-lg shadow-black/20" : "bg-white border-slate-200/80 shadow-sm"
+                isDark ? "bg-[#1e1e1e] border-[#2e2e2e] shadow-lg shadow-black/20" : "bg-white border-slate-200/80 shadow-sm"
               }`}>
                 <div>
                   <div className={`text-xs font-bold uppercase tracking-wider ${isDark ? "text-zinc-400" : "text-slate-500"}`}>Solved</div>
@@ -240,7 +251,7 @@ const DSADashboard = () => {
 
               {/* Total XP */}
               <div className={`border rounded-2xl p-5 flex items-center justify-between transition-all ${
-                isDark ? "bg-zinc-900 border-zinc-800/80 shadow-lg shadow-black/20" : "bg-white border-slate-200/80 shadow-sm"
+                isDark ? "bg-[#1e1e1e] border-[#2e2e2e] shadow-lg shadow-black/20" : "bg-white border-slate-200/80 shadow-sm"
               }`}>
                 <div>
                   <div className={`text-xs font-bold uppercase tracking-wider ${isDark ? "text-zinc-400" : "text-slate-500"}`}>Total XP</div>
@@ -256,7 +267,7 @@ const DSADashboard = () => {
 
               {/* Daily Goal */}
               <div className={`border rounded-2xl p-5 flex flex-col justify-between transition-all ${
-                isDark ? "bg-zinc-900 border-zinc-800/80 shadow-lg shadow-black/20" : "bg-white border-slate-200/80 shadow-sm"
+                isDark ? "bg-[#1e1e1e] border-[#2e2e2e] shadow-lg shadow-black/20" : "bg-white border-slate-200/80 shadow-sm"
               }`}>
                 <div className="flex items-center justify-between mb-2">
                   <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? "text-zinc-400" : "text-slate-500"}`}>Daily Goal</span>
@@ -269,7 +280,7 @@ const DSADashboard = () => {
                         value={tempGoal}
                         onChange={(e) => setTempGoal(Number(e.target.value))}
                         className={`w-10 text-center text-[10px] font-bold py-0.5 rounded border focus:outline-none focus:ring-1 focus:ring-purple-500 ${
-                          isDark ? "bg-zinc-950 border-zinc-800 text-purple-400" : "bg-slate-50 border-slate-200 text-purple-600"
+                          isDark ? "bg-[#1a1a1a] border-[#2e2e2e] text-purple-400" : "bg-slate-50 border-slate-200 text-purple-600"
                         }`}
                       />
                       <button
@@ -319,7 +330,7 @@ const DSADashboard = () => {
 
             {/* Filter Panel */}
             <div className={`border rounded-2xl p-5 transition-all ${
-              isDark ? "bg-zinc-900 border-zinc-800/80 shadow-lg" : "bg-white border-slate-200 shadow-sm"
+              isDark ? "bg-[#1e1e1e] border-[#2e2e2e] shadow-lg" : "bg-white border-slate-200 shadow-sm"
             }`}>
               <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row gap-3 mb-4">
                 <div className="relative flex-1">
@@ -331,8 +342,8 @@ const DSADashboard = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={`w-full border rounded-xl py-2.5 pl-10 pr-4 text-sm transition-all focus:outline-none focus:ring-2 ${
                       isDark 
-                        ? "bg-zinc-950 border-zinc-850 text-zinc-200 placeholder-zinc-600 focus:border-indigo-500 focus:ring-indigo-900/30" 
-                        : "bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-indigo-550 focus:ring-indigo-100"
+                        ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-200 placeholder-zinc-650 focus:border-indigo-500 focus:ring-indigo-900/30" 
+                        : "bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-indigo-555 focus:ring-indigo-100"
                     }`}
                   />
                 </div>
@@ -354,7 +365,7 @@ const DSADashboard = () => {
                   value={selectedTopic}
                   onChange={(e) => setSelectedTopic(e.target.value)}
                   className={`border rounded-xl px-3 py-2 text-xs transition-all focus:outline-none focus:border-indigo-500 ${
-                    isDark ? "bg-zinc-950 border-zinc-850 text-zinc-300" : "bg-white border-slate-200 text-slate-700 shadow-xs"
+                    isDark ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-300" : "bg-white border-slate-200 text-slate-700 shadow-xs"
                   }`}
                 >
                   <option value="">All Topics</option>
@@ -368,7 +379,7 @@ const DSADashboard = () => {
                   value={selectedDifficulty}
                   onChange={(e) => setSelectedDifficulty(e.target.value)}
                   className={`border rounded-xl px-3 py-2 text-xs transition-all focus:outline-none focus:border-indigo-500 ${
-                    isDark ? "bg-zinc-950 border-zinc-850 text-zinc-300" : "bg-white border-slate-200 text-slate-700 shadow-xs"
+                    isDark ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-300" : "bg-white border-slate-200 text-slate-700 shadow-xs"
                   }`}
                 >
                   <option value="">All Difficulties</option>
@@ -382,7 +393,7 @@ const DSADashboard = () => {
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
                   className={`border rounded-xl px-3 py-2 text-xs transition-all focus:outline-none focus:border-indigo-500 ${
-                    isDark ? "bg-zinc-950 border-zinc-850 text-zinc-300" : "bg-white border-slate-200 text-slate-700 shadow-xs"
+                    isDark ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-300" : "bg-white border-slate-200 text-slate-700 shadow-xs"
                   }`}
                 >
                   <option value="">All Statuses</option>
@@ -395,7 +406,7 @@ const DSADashboard = () => {
                   value={selectedCompany}
                   onChange={(e) => setSelectedCompany(e.target.value)}
                   className={`border rounded-xl px-3 py-2 text-xs transition-all focus:outline-none focus:border-indigo-500 ${
-                    isDark ? "bg-zinc-950 border-zinc-850 text-zinc-300" : "bg-white border-slate-200 text-slate-700 shadow-xs"
+                    isDark ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-300" : "bg-white border-slate-200 text-slate-700 shadow-xs"
                   }`}
                 >
                   <option value="">All Companies</option>
@@ -408,15 +419,15 @@ const DSADashboard = () => {
 
             {/* Problems Catalog Table */}
             <div className={`border rounded-2xl overflow-hidden transition-all ${
-              isDark ? "bg-zinc-900 border-zinc-800/80 shadow-lg" : "bg-white border-slate-200 shadow-sm"
+              isDark ? "bg-[#1e1e1e] border-[#2e2e2e] shadow-lg" : "bg-white border-slate-200 shadow-sm"
             }`}>
-              <div className={`p-5 border-b flex items-center justify-between ${isDark ? "border-zinc-800" : "border-slate-100"}`}>
+              <div className={`p-5 border-b flex items-center justify-between ${isDark ? "border-[#2e2e2e]" : "border-slate-100"}`}>
                 <h3 className="font-extrabold text-sm tracking-tight flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-indigo-500" />
                   Problems Catalog
                 </h3>
                 <span className={`text-[11px] font-bold px-3 py-1 rounded-full border ${
-                  isDark ? "bg-zinc-950 border-zinc-800 text-zinc-400" : "bg-slate-50 border-slate-200 text-slate-500"
+                  isDark ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-400" : "bg-slate-50 border-slate-205 text-slate-500"
                 }`}>
                   Showing {problems.length} problems
                 </span>
@@ -443,20 +454,20 @@ const DSADashboard = () => {
                     }
 
                     return (
-                      <div key={topicName} className={`border-b last:border-b-0 ${isDark ? "border-zinc-800" : "border-slate-100"}`}>
+                      <div key={topicName} className={`border-b last:border-b-0 ${isDark ? "border-[#2e2e2e]" : "border-slate-100"}`}>
                         {/* Accordion Header bar */}
                         <div
                           onClick={() => toggleTopicExpand(topicName)}
                           className={`flex items-center justify-between px-5 py-4 cursor-pointer select-none transition-all ${
                             isDark 
-                              ? "bg-zinc-950/40 hover:bg-zinc-850/50 text-zinc-200" 
+                              ? "bg-[#1a1a1a]/40 hover:bg-[#252525]/50 text-zinc-200" 
                               : "bg-slate-50 hover:bg-slate-100/60 text-slate-900"
                           }`}
                         >
                           <div className="flex items-center gap-3">
                             <span className="font-extrabold text-sm tracking-tight">{topicName}</span>
                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                              isDark ? "bg-zinc-900 border-zinc-800 text-zinc-400" : "bg-white border-slate-200 text-slate-500"
+                              isDark ? "bg-[#1e1e1e] border-[#2e2e2e] text-zinc-400" : "bg-white border-slate-200 text-slate-500"
                             }`}>
                               {topicSolvedCount} / {totalInTopic} Solved
                             </span>
@@ -481,7 +492,7 @@ const DSADashboard = () => {
                               <table className="w-full text-left border-collapse min-w-[600px]">
                                 <thead>
                                   <tr className={`border-b text-[10px] font-bold uppercase tracking-wider ${
-                                    isDark ? "border-zinc-800/60 text-zinc-500 bg-zinc-950/10" : "border-slate-150 text-slate-400 bg-slate-50/20"
+                                    isDark ? "border-[#2e2e2e]/60 text-zinc-500 bg-[#1a1a1a]/10" : "border-slate-150 text-slate-400 bg-slate-50/20"
                                   }`}>
                                     <th className="py-3.5 px-5 w-[6%] text-center">#</th>
                                     <th className="py-3.5 px-4 w-[35%]">Title</th>
@@ -497,7 +508,7 @@ const DSADashboard = () => {
                                       key={prob._id}
                                       onClick={() => navigate(`/dsa/problem/${prob._id}`)}
                                       className={`cursor-pointer transition-all duration-200 group ${
-                                        isDark ? "hover:bg-zinc-850/30" : "hover:bg-slate-100/40"
+                                        isDark ? "hover:bg-[#252525]/30" : "hover:bg-slate-100/40"
                                       }`}
                                     >
                                       <td className="py-3.5 px-5 text-center font-mono text-xs text-zinc-500">
@@ -544,7 +555,7 @@ const DSADashboard = () => {
                                             </span>
                                           ) : (
                                             <span className={`font-medium px-2.5 py-0.5 rounded-full border ${
-                                              isDark ? "bg-zinc-950 border-zinc-800 text-zinc-500" : "bg-slate-50 border-slate-205 text-slate-400"
+                                              isDark ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-500" : "bg-slate-50 border-slate-205 text-slate-400"
                                             }`}>
                                               Unsolved
                                             </span>
@@ -573,7 +584,7 @@ const DSADashboard = () => {
             
             {/* Topic Wise Trackers */}
             <div className={`border rounded-2xl p-5 transition-all ${
-              isDark ? "bg-zinc-900 border-zinc-800/80 shadow-lg" : "bg-white border-slate-200 shadow-sm"
+              isDark ? "bg-[#1e1e1e] border-[#2e2e2e] shadow-lg" : "bg-white border-slate-200 shadow-sm"
             }`}>
               <h3 className="font-extrabold text-sm tracking-tight mb-4 flex items-center gap-2">
                 <Star className="w-5 h-5 text-indigo-500" />
@@ -582,7 +593,19 @@ const DSADashboard = () => {
               <div className="flex flex-col gap-4">
                 {topicsList.map((t) => {
                   const stat = stats.topicProgress?.find((tp) => tp.topicName === t) || { solvedCount: 0 };
-                  const topicTotal = t === "Arrays" ? 10 : 8;
+                  const topicTotals = {
+                    "Mathematics": 10,
+                    "Arrays": 11,
+                    "Strings": 3,
+                    "Linked List": 4,
+                    "Prefix Sum": 7,
+                    "Sliding Window": 7,
+                    "Binary Search": 14,
+                    "Trees": 24,
+                    "Graphs": 14,
+                    "Dynamic Programming": 13
+                  };
+                  const topicTotal = topicTotals[t] || 8;
                   const percentage = Math.min(100, Math.round((stat.solvedCount / topicTotal) * 100));
 
                   return (
@@ -600,7 +623,7 @@ const DSADashboard = () => {
 
             {/* Bookmarked Questions */}
             <div className={`border rounded-2xl p-5 transition-all ${
-              isDark ? "bg-zinc-900 border-zinc-800/80 shadow-lg" : "bg-white border-slate-200 shadow-sm"
+              isDark ? "bg-[#1e1e1e] border-[#2e2e2e] shadow-lg" : "bg-white border-slate-200 shadow-sm"
             }`}>
               <h3 className="font-extrabold text-sm tracking-tight mb-3 flex items-center gap-2">
                 <Star className="w-5 h-5 text-yellow-500 fill-yellow-500/10" />
@@ -617,7 +640,7 @@ const DSADashboard = () => {
                       key={b._id}
                       onClick={() => navigate(`/dsa/problem/${b.problemId}`)}
                       className={`border rounded-xl p-3 cursor-pointer transition-colors ${
-                        isDark ? "bg-zinc-950 border-zinc-850 hover:bg-zinc-900" : "bg-slate-50 border-slate-150 hover:bg-slate-100"
+                        isDark ? "bg-[#1a1a1a] border-[#2e2e2e] hover:bg-[#252525]" : "bg-slate-50 border-slate-150 hover:bg-slate-100"
                       }`}
                     >
                       <div className="flex justify-between items-start gap-2">
@@ -643,7 +666,7 @@ const DSADashboard = () => {
 
             {/* Recent Activity Feed */}
             <div className={`border rounded-2xl p-5 transition-all ${
-              isDark ? "bg-zinc-900 border-zinc-800/80 shadow-lg" : "bg-white border-slate-200 shadow-sm"
+              isDark ? "bg-[#1e1e1e] border-[#2e2e2e] shadow-lg" : "bg-white border-slate-200 shadow-sm"
             }`}>
               <h3 className="font-extrabold text-sm tracking-tight mb-3 flex items-center gap-2">
                 <Flame className="w-5 h-5 text-orange-500" />
@@ -657,7 +680,7 @@ const DSADashboard = () => {
                 <div className="flex flex-col gap-3">
                   {stats.recentActivity?.map((a) => (
                     <div key={a._id} className={`flex justify-between items-center border rounded-xl p-2.5 ${
-                      isDark ? "bg-zinc-950 border-zinc-850" : "bg-slate-50 border-slate-150"
+                      isDark ? "bg-[#1a1a1a] border-[#2e2e2e]" : "bg-slate-50 border-slate-150"
                     }`}>
                       <div>
                         <div className="text-xs font-bold">{a.problemTitle}</div>

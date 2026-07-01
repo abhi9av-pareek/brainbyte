@@ -4,8 +4,15 @@ export const DRIVER_TEMPLATES = {
     cpp: `
 #include <iostream>
 #include <vector>
-#include <sstream>
 #include <string>
+#include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <climits>
+#include <cmath>
+#include <sstream>
 using namespace std;
 
 // [STUDENT_CODE]
@@ -31,7 +38,11 @@ int main() {
 `,
     python: `
 import sys
-from typing import List
+import math
+import collections
+import heapq
+import bisect
+from typing import List, Dict, Tuple, Set, Optional, Deque
 
 # [STUDENT_CODE]
 
@@ -88,8 +99,15 @@ public class SolutionMain {
     cpp: `
 #include <iostream>
 #include <vector>
-#include <sstream>
 #include <string>
+#include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <climits>
+#include <cmath>
+#include <sstream>
 using namespace std;
 
 // [STUDENT_CODE]
@@ -108,7 +126,11 @@ int main() {
 `,
     python: `
 import sys
-from typing import List
+import math
+import collections
+import heapq
+import bisect
+from typing import List, Dict, Tuple, Set, Optional, Deque
 
 # [STUDENT_CODE]
 
@@ -154,8 +176,15 @@ public class SolutionMain {
     cpp: `
 #include <iostream>
 #include <vector>
-#include <sstream>
 #include <string>
+#include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <climits>
+#include <cmath>
+#include <sstream>
 using namespace std;
 
 // [STUDENT_CODE]
@@ -174,7 +203,11 @@ int main() {
 `,
     python: `
 import sys
-from typing import List
+import math
+import collections
+import heapq
+import bisect
+from typing import List, Dict, Tuple, Set, Optional, Deque
 
 # [STUDENT_CODE]
 
@@ -219,6 +252,16 @@ public class SolutionMain {
   "climbing-stairs": {
     cpp: `
 #include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <climits>
+#include <cmath>
+#include <sstream>
 using namespace std;
 
 // [STUDENT_CODE]
@@ -234,6 +277,11 @@ int main() {
 `,
     python: `
 import sys
+import math
+import collections
+import heapq
+import bisect
+from typing import List, Dict, Tuple, Set, Optional, Deque
 
 # [STUDENT_CODE]
 

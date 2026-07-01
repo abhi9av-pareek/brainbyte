@@ -8,7 +8,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
 
   return (
     <div className={`h-full overflow-y-auto border rounded-2xl p-6 flex flex-col gap-5 custom-scrollbar transition-colors duration-300 ${
-      isDark ? "bg-zinc-900/60 border-zinc-800/80" : "bg-white border-slate-200 shadow-xs"
+      isDark ? "bg-[#1e1e1e]/60 border-[#2e2e2e]" : "bg-white border-slate-200 shadow-xs"
     }`}>
       
       {/* Title & Actions */}
@@ -30,7 +30,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
             bookmarked 
               ? "bg-yellow-950/20 border-yellow-800/50 text-yellow-500 fill-yellow-500" 
               : isDark 
-                ? "bg-zinc-950 border-zinc-850 text-zinc-400 hover:text-zinc-200" 
+                ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-400 hover:text-zinc-200" 
                 : "bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-800 shadow-xs"
           }`}
           title={bookmarked ? "Bookmarked!" : "Bookmark Problem"}
@@ -70,7 +70,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
       <div>
         <h4 className={`text-[10px] font-bold uppercase tracking-wider mb-2.5 ${isDark ? "text-zinc-500" : "text-slate-400"}`}>Topic</h4>
         <span className={`text-xs font-bold rounded-lg px-3 py-1.5 border ${
-          isDark ? "bg-zinc-955 border-zinc-850 text-zinc-300" : "bg-slate-100/70 border-slate-200 text-slate-650"
+          isDark ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-300" : "bg-slate-100/70 border-slate-200 text-slate-650"
         }`}>
           {problem.topic}
         </span>
@@ -88,7 +88,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
           <div className="flex flex-wrap gap-1.5">
             {problem.companies.map((c) => (
               <span key={c} className={`text-xs font-semibold px-2.5 py-1 rounded-lg border ${
-                isDark ? "bg-zinc-955 text-zinc-400 border-zinc-850" : "bg-slate-50 text-slate-600 border-slate-200"
+                isDark ? "bg-[#1a1a1a] text-zinc-400 border-[#2e2e2e]" : "bg-slate-50 text-slate-600 border-slate-200"
               }`}>
                 {c}
               </span>
@@ -97,7 +97,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
         </div>
       )}
 
-      <hr className={isDark ? "border-zinc-800/80" : "border-slate-150"} />
+      <hr className={isDark ? "border-[#2e2e2e]" : "border-slate-150"} />
 
       {/* Statement */}
       <div className="flex flex-col gap-2">
@@ -107,7 +107,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
         </div>
       </div>
 
-      <hr className={isDark ? "border-zinc-800/80" : "border-slate-150"} />
+      <hr className={isDark ? "border-[#2e2e2e]" : "border-slate-150"} />
 
       {/* Input Format */}
       <div className="flex flex-col gap-2">
@@ -117,7 +117,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
         </div>
       </div>
 
-      <hr className={isDark ? "border-zinc-800/80" : "border-slate-150"} />
+      <hr className={isDark ? "border-[#2e2e2e]" : "border-slate-150"} />
 
       {/* Output Format */}
       <div className="flex flex-col gap-2">
@@ -127,7 +127,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
         </div>
       </div>
 
-      <hr className={isDark ? "border-zinc-800/80" : "border-slate-150"} />
+      <hr className={isDark ? "border-[#2e2e2e]" : "border-slate-150"} />
 
       {/* Constraints */}
       <div className="flex flex-col gap-2">
@@ -139,7 +139,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
         </div>
       </div>
 
-      <hr className={isDark ? "border-zinc-800/80" : "border-slate-150"} />
+      <hr className={isDark ? "border-[#2e2e2e]" : "border-slate-150"} />
 
       {/* Examples */}
       <div className="flex flex-col gap-6">
@@ -150,7 +150,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
               Example {index + 1}
             </h5>
             <div className={`font-mono text-xs p-4 rounded-xl border flex flex-col gap-2.5 ${
-              isDark ? "bg-zinc-950/60 border-zinc-850 text-zinc-300" : "bg-slate-50/50 border-slate-200 text-slate-700"
+              isDark ? "bg-[#1a1a1a]/60 border-[#2e2e2e] text-zinc-300" : "bg-slate-50/50 border-slate-200 text-slate-700"
             }`}>
               <div>
                 <span className="text-zinc-500 font-bold mr-2 text-[10px] uppercase">Input:</span>
@@ -162,7 +162,7 @@ const ProblemDescPane = ({ problem, bookmarked, onToggleBookmark, togglingBookma
               </div>
               {ex.explanation && (
                 <div className={`border-t pt-2 italic font-sans leading-relaxed text-xs ${
-                  isDark ? "border-zinc-900 text-zinc-400" : "border-slate-150 text-slate-500"
+                  isDark ? "border-[#2e2e2e] text-zinc-400" : "border-slate-150 text-slate-505"
                 }`}>
                   <span className="font-bold not-italic">Explanation: </span>
                   {ex.explanation}

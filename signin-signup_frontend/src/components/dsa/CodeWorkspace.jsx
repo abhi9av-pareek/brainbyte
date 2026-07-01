@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Sparkles, ArrowLeft, Sun, Moon } from "lucide-react";
+import { Sparkles, ArrowLeft, Sun, Moon, Star } from "lucide-react";
 import ProblemDescPane from "./ProblemDescPane";
 import SubmissionsPane from "./SubmissionsPane";
 import MonacoEditorPane from "./MonacoEditorPane";
@@ -244,7 +244,7 @@ const CodeWorkspace = () => {
   if (loading && !problem) {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center ${
-        isDark ? "bg-[#030303] text-zinc-500" : "bg-slate-50 text-slate-400"
+        isDark ? "bg-[#1a1a1a] text-zinc-500" : "bg-slate-50 text-slate-400"
       }`}>
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-indigo-500"></div>
         <span className="mt-4 text-xs font-mono">Assembling IDE Workspace...</span>
@@ -254,18 +254,18 @@ const CodeWorkspace = () => {
 
   return (
     <div className={`h-screen flex flex-col overflow-hidden font-sans transition-colors duration-300 ${
-      isDark ? "bg-[#030303] text-zinc-100" : "bg-slate-50 text-slate-900"
+      isDark ? "bg-[#1a1a1a] text-zinc-100" : "bg-slate-50 text-slate-900"
     }`}>
       
       {/* Header (Top Navigation bar) */}
       <header className={`px-4 py-3 flex justify-between items-center z-10 shrink-0 border-b ${
-        isDark ? "bg-zinc-900/80 border-zinc-800" : "bg-white border-slate-200 shadow-xs"
+        isDark ? "bg-[#1e1e1e]/80 border-[#2e2e2e]" : "bg-white border-slate-200 shadow-xs"
       }`}>
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/dsa")}
             className={`p-2 rounded-xl transition-all ${
-              isDark ? "hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200" : "hover:bg-slate-100 text-slate-650 hover:text-slate-900"
+              isDark ? "hover:bg-[#2a2a2a] text-zinc-400 hover:text-zinc-200" : "hover:bg-slate-100 text-slate-655 hover:text-slate-900"
             }`}
             title="Back to Sheet dashboard"
           >
@@ -285,7 +285,7 @@ const CodeWorkspace = () => {
             onClick={toggleTheme}
             className={`p-2 rounded-xl border transition-all ${
               isDark 
-                ? "bg-zinc-900 border-zinc-800 text-yellow-400 hover:bg-zinc-850" 
+                ? "bg-[#1e1e1e] border-[#2e2e2e] text-yellow-400 hover:bg-[#2a2a2a]" 
                 : "bg-white border-slate-200 text-indigo-600 hover:bg-slate-100 shadow-xs"
             }`}
             title="Toggle Light/Dark Theme"
@@ -313,11 +313,11 @@ const CodeWorkspace = () => {
         {/* Left Column: Problem Information Details (35% Width) */}
         {!isFullScreen && (
           <div className={`w-full md:w-[35%] h-full flex flex-col shrink-0 border rounded-2xl overflow-hidden ${
-            isDark ? "bg-zinc-900/60 border-zinc-800/80" : "bg-white border-slate-200 shadow-xs"
+            isDark ? "bg-[#1e1e1e]/60 border-[#2e2e2e]" : "bg-white border-slate-200 shadow-xs"
           }`}>
             {/* Tabs Header bar */}
             <div className={`flex border-b text-xs font-semibold px-2 shrink-0 ${
-              isDark ? "border-zinc-800 bg-zinc-950/20" : "border-slate-150 bg-slate-50/50"
+              isDark ? "border-[#2e2e2e] bg-[#1a1a1a]/20" : "border-slate-150 bg-slate-50/50"
             }`}>
               <button
                 onClick={() => setActiveTab("description")}
@@ -394,7 +394,7 @@ const CodeWorkspace = () => {
             {/* Custom Input sidebar pane (dotted panel layout) */}
             {!isFullScreen && isCustomInputOpen && (
               <div className={`w-full sm:w-[250px] h-full flex flex-col shrink-0 border-l border-dashed pl-1 ${
-                isDark ? "border-zinc-800" : "border-slate-200"
+                isDark ? "border-[#2e2e2e]" : "border-slate-200"
               }`}>
                 <CustomInputPane
                   customInput={customInput}
@@ -445,7 +445,7 @@ const CodeWorkspace = () => {
       {isBookmarkModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className={`w-full max-w-md border rounded-2xl p-6 flex flex-col gap-4 shadow-2xl transition-all ${
-            isDark ? "bg-zinc-900 border-zinc-800 text-zinc-100" : "bg-white border-slate-200 text-slate-900"
+            isDark ? "bg-[#1e1e1e] border-[#2e2e2e] text-zinc-100" : "bg-white border-slate-200 text-slate-900"
           }`}>
             <div>
               <h3 className="font-extrabold text-base tracking-tight flex items-center gap-2">
@@ -463,7 +463,7 @@ const CodeWorkspace = () => {
               onChange={(e) => setBookmarkNotes(e.target.value)}
               placeholder="e.g. Note down logic, tricky cases, or time complexity here..."
               className={`w-full h-24 border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 transition-colors resize-none custom-scrollbar ${
-                isDark ? "bg-zinc-950 border-zinc-850 text-zinc-300" : "bg-slate-50 border-slate-200 text-slate-700"
+                isDark ? "bg-[#1a1a1a] border-[#2e2e2e] text-zinc-300" : "bg-slate-50 border-slate-200 text-slate-700"
               }`}
             />
 
@@ -471,7 +471,7 @@ const CodeWorkspace = () => {
               <button
                 onClick={() => setIsBookmarkModalOpen(false)}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold border ${
-                  isDark ? "bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-850" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                  isDark ? "bg-[#1e1e1e] border-[#2e2e2e] text-zinc-300 hover:bg-[#2a2a2a]" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
                 }`}
               >
                 Cancel

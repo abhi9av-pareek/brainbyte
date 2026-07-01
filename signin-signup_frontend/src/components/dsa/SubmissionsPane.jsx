@@ -61,9 +61,9 @@ const SubmissionsPane = ({ problemId, onLoadCode, theme, activeTab }) => {
 
   return (
     <div className={`h-full overflow-y-auto p-5 flex flex-col gap-4 custom-scrollbar transition-colors duration-300 ${
-      isDark ? "bg-zinc-900/40" : "bg-white"
+      isDark ? "bg-[#1e1e1e]/40" : "bg-white"
     }`}>
-      <div className="flex justify-between items-center border-b pb-2 border-zinc-800/40">
+      <div className="flex justify-between items-center border-b pb-2 border-[#2e2e2e]/40">
         <h4 className={`text-xs font-bold uppercase tracking-wider ${isDark ? "text-zinc-400" : "text-slate-500"}`}>
           Submission Logs ({submissions.length})
         </h4>
@@ -93,7 +93,7 @@ const SubmissionsPane = ({ problemId, onLoadCode, theme, activeTab }) => {
                 onClick={() => onLoadCode(sub.code, sub.language)}
                 className={`border rounded-2xl p-4 cursor-pointer transition-all duration-200 group flex items-center justify-between ${
                   isDark 
-                    ? "bg-zinc-950/60 border-zinc-850 hover:bg-zinc-900" 
+                    ? "bg-[#1a1a1a]/60 border-[#2e2e2e] hover:bg-[#252525]" 
                     : "bg-slate-50/60 border-slate-200 hover:bg-slate-100/60 shadow-xs"
                 }`}
                 title="Load code into editor"
@@ -107,7 +107,7 @@ const SubmissionsPane = ({ problemId, onLoadCode, theme, activeTab }) => {
                       {sub.status}
                     </span>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
-                      isDark ? "bg-zinc-900 border-zinc-800 text-zinc-400" : "bg-white border-slate-250 text-slate-600"
+                      isDark ? "bg-[#1e1e1e] border-[#2e2e2e] text-zinc-400" : "bg-white border-slate-250 text-slate-650"
                     }`}>
                       {sub.language}
                     </span>

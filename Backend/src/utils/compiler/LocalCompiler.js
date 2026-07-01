@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { CompilerInterface } from "./CompilerInterface.js";
 import { DRIVER_TEMPLATES } from "./driverTemplates.js";
+import { getDynamicDriver } from "./driverGenerator.js";
 
 const TEMP_DIR = path.resolve("./temp_runs");
 if (!fs.existsSync(TEMP_DIR)) {
@@ -22,11 +23,16 @@ const cleanFiles = (filePaths) => {
 export class LocalCompiler extends CompilerInterface {
   async execute(code, language, input, problemId = "") {
     const runId = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-    const driver = DRIVER_TEMPLATES[problemId]?.[language];
+    let driver = DRIVER_TEMPLATES[problemId]?.[language];
 
-    // If driver is available, compile & execute physically
+    if (!driver && problemId) {
+      driver = await getDynamicDriver(problemId, language, code);
+    }
+
     if (driver) {
-      const mergedCode = driver.replace("// [STUDENT_CODE]", code);
+      const mergedCode = driver.includes("// [STUDENT_CODE]")
+        ? driver.replace("// [STUDENT_CODE]", code)
+        : driver;
       return this._runPhysical(mergedCode, language, input, runId);
     } else {
       // General syntax checking fallback
@@ -40,7 +46,11 @@ export class LocalCompiler extends CompilerInterface {
     let maxRuntime = 0;
     let maxMemory = 1024; // KB
 
-    const driver = DRIVER_TEMPLATES[problemId]?.[language];
+    let driver = DRIVER_TEMPLATES[problemId]?.[language];
+    if (!driver && problemId) {
+      driver = await getDynamicDriver(problemId, language, code);
+    }
+
     if (!driver) {
       // Fallback syntax check first
       const check = await this._runSyntaxCheck(code, language, "");
