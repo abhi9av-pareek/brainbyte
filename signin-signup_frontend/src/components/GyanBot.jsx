@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import ghostIcon from "../assets/gyanbot-icon.png";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const STORAGE_KEY = "gyanbot-history";
 const RAG_KEY = "gyanbot-allow-rag";
 
