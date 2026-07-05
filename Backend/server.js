@@ -11,6 +11,7 @@ import dsaProblemRoutes from "./src/routes/problemRoutes.js";
 import dsaSubmissionRoutes from "./src/routes/submissionRoutes.js";
 import dsaAiRoutes from "./src/routes/aiRoutes.js";
 import dsaProgressRoutes from "./src/routes/progressRoutes.js";
+import gyanbotRoutes from "./src/routes/gyanbotRoutes.js";
 
 dotenv.config();
 
@@ -65,6 +66,9 @@ app.use("/api/dsa/problems", dsaProblemRoutes);
 app.use("/api/dsa/problems", dsaSubmissionRoutes);
 app.use("/api/dsa/ai", dsaAiRoutes);
 app.use("/api/dsa/progress", dsaProgressRoutes);
+
+// GyanBot AI Chatbot
+app.use("/api/gyanbot", gyanbotRoutes);
 
 // root route
 app.get("/", (req, res) => {

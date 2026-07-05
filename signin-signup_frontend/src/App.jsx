@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import LoginModern from "./components/LoginModern";
 import Signup from "./components/Signup";
@@ -15,11 +15,24 @@ import Bookmarks from "./components/Bookmarks";
 import GyanS from "./components/GyanS";
 import DSADashboard from "./components/dsa/DSADashboard";
 import CodeWorkspace from "./components/dsa/CodeWorkspace";
+import GyanBot from "./components/GyanBot";
+
+// Routes where GyanBot should NOT appear (pre-login pages)
+const PRE_LOGIN_ROUTES = ["/", "/landing", "/blog", "/login", "/signup"];
+
+function GyanBotGlobal() {
+  const { pathname } = useLocation();
+  const isPostLogin = !PRE_LOGIN_ROUTES.includes(pathname);
+  if (!isPostLogin) return null;
+  return <GyanBot />;
+}
 
 function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
+        {/* GyanBot floats on all post-login pages automatically */}
+        <GyanBotGlobal />
         <Routes>
           {/* Landing page is the entry point */}
           <Route path="/"          element={<GyantraLanding />} />
